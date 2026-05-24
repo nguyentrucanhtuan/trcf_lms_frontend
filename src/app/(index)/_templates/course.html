@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vận hành quán cà phê — CoffeeTree</title>
+<link rel="stylesheet" href="styles/design-system.css" />
+<style>
+  /* page-specific layout — design-system tokens only */
+  body { overflow-x: hidden; }
+
+  /* ============ NAV / TOP BAR ============ */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px;
+    padding: 14px 48px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav .brand { display: flex; align-items: center; gap: 10px; }
+  .nav .brand h2 { font-size: 16px; font-weight: 700; margin: 0; }
+  .nav-menu {
+    display: flex; gap: 4px;
+    margin-left: 12px;
+  }
+  .nav-menu a {
+    padding: 8px 14px;
+    color: var(--ink-2);
+    font-size: 14px; font-weight: 500;
+    border-radius: var(--r-md);
+    transition: background .15s, color .15s;
+    text-decoration: none;
+  }
+  .nav-menu a:hover { background: var(--line-2); color: var(--ink); text-decoration: none; }
+  .nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  .nav-link {
+    padding: 8px 14px; color: var(--ink-2); font-size: 13px; font-weight: 500;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--ink); text-decoration: none; }
+
+  /* ============ HERO ============ */
+  .hero {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 72px 48px 60px;
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    background: var(--primary-soft); color: var(--primary);
+    border-radius: var(--r-full);
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .eyebrow .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--primary); }
+  .hero h1 {
+    font-size: 52px; line-height: 1.08; font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px; color: var(--ink);
+    text-wrap: balance;
+  }
+  .hero h1 .accent { color: var(--primary); }
+  .hero .lead {
+    font-size: 17px; line-height: 1.6; color: var(--ink-2);
+    margin: 0 0 28px; max-width: 540px;
+  }
+  .hero-meta {
+    display: flex; gap: 24px;
+    padding: 16px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin: 0 0 28px;
+  }
+  .hero-meta .item { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 13px; }
+  .hero-meta .item .ms { color: var(--primary); }
+  .hero-meta .item strong { color: var(--ink); font-weight: 700; }
+
+  .hero-cta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .hero-cta .ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--ink); font-weight: 500; font-size: 14px;
+    text-decoration: none;
+    padding: 12px 4px;
+  }
+  .hero-cta .ghost .play {
+    width: 36px; height: 36px; border-radius: 999px;
+    background: var(--line-2); display: grid; place-items: center;
+    color: var(--primary);
+  }
+
+  /* ---- Hero visual ---- */
+  .hero-visual {
+    position: relative;
+    aspect-ratio: 1/1;
+    max-width: 520px;
+    margin-left: auto;
+  }
+  .visual-main {
+    width: 100%; height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .visual-main::before {
+    /* subtle coffee bean glyph */
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 55%, rgba(255,255,255,.05), transparent 60%),
+      radial-gradient(circle at 30% 30%, rgba(13,89,242,.18), transparent 50%);
+  }
+  .visual-tag {
+    position: absolute; top: 18px; left: 18px;
+    font-size: 11px; color: rgba(255,255,255,.55);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    font-family: 'Roboto', monospace; font-weight: 500;
+  }
+  .visual-caption {
+    position: absolute; bottom: 24px; left: 24px; right: 24px;
+    color: white;
+  }
+  .visual-caption .title { font-size: 18px; font-weight: 700; }
+  .visual-caption .sub { font-size: 13px; opacity: 0.75; margin-top: 4px; }
+
+  /* Floating cards on hero */
+  .float-card {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-md);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .float-card .icn {
+    width: 36px; height: 36px; border-radius: var(--r-md);
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center; flex-shrink: 0;
+  }
+  .float-card.tl { top: 14%; left: -32px; }
+  .float-card.br { bottom: 14%; right: -28px; }
+  .float-card .info { line-height: 1.3; }
+  .float-card .info .v { font-size: 18px; font-weight: 700; color: var(--ink); }
+  .float-card .info .l { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* ============ STATS ============ */
+  .stats {
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .stats-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 32px 48px;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  .stat {
+    display: flex; flex-direction: column; gap: 4px;
+    padding-left: 16px;
+    border-left: 2px solid var(--primary);
+  }
+  .stat .num { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+  .stat .lbl { font-size: 13px; color: var(--ink-2); }
+
+  /* ============ SECTIONS ============ */
+  .section {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 96px 48px;
+  }
+  .section-head {
+    max-width: 720px;
+    margin: 0 auto 56px;
+    text-align: center;
+  }
+  .section-head .kicker {
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-head h2 {
+    font-size: 38px; line-height: 1.15; font-weight: 700;
+    margin: 0 0 16px; color: var(--ink); letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .section-head p {
+    font-size: 16px; line-height: 1.6; color: var(--ink-2); margin: 0;
+  }
+
+  /* ============ FEATURE GRID ============ */
+  .features {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .feature {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    transition: border-color .15s, transform .15s;
+  }
+  .feature:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .feature .icn {
+    width: 44px; height: 44px; border-radius: var(--r-md);
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center;
+    margin-bottom: 18px;
+  }
+  .feature .icn .ms { font-size: 24px; }
+  .feature h3 {
+    font-size: 17px; font-weight: 700; margin: 0 0 8px;
+    color: var(--ink); letter-spacing: -0.005em;
+  }
+  .feature p {
+    font-size: 14px; line-height: 1.6; color: var(--ink-2); margin: 0;
+  }
+
+  /* ============ CURRICULUM ============ */
+  .curriculum-section { background: var(--surface); }
+  .curriculum {
+    display: grid; gap: 12px;
+  }
+  .module-row {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .module-head {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 56px 1fr auto auto;
+    gap: 20px;
+    align-items: center;
+    padding: 20px 24px;
+    text-align: left;
+    transition: background .15s;
+  }
+  .module-head:hover { background: var(--line-2); }
+  .module-num {
+    width: 44px; height: 44px; border-radius: var(--r-md);
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center;
+    font-weight: 700; font-size: 16px;
+  }
+  .module-info .ttl { font-size: 16px; font-weight: 700; color: var(--ink); }
+  .module-info .sub { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+  .module-stats { display: flex; gap: 16px; color: var(--ink-3); font-size: 12px; }
+  .module-stats span { display: inline-flex; align-items: center; gap: 4px; }
+  .module-stats .ms { font-size: 14px; }
+  .module-head .toggle { color: var(--ink-3); }
+
+  .module-body {
+    border-top: 1px solid var(--line);
+    background: var(--line-2);
+    padding: 8px 24px 16px;
+    display: none;
+  }
+  .module-row.open .module-body { display: block; }
+  .module-row.open .toggle { transform: rotate(180deg); }
+  .module-head .toggle { transition: transform .2s; }
+  .module-lesson {
+    display: grid; grid-template-columns: 24px 1fr auto;
+    gap: 12px; align-items: center;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .module-lesson:last-child { border-bottom: none; }
+  .module-lesson .ms { color: var(--primary); font-size: 18px; }
+  .module-lesson .name { color: var(--ink); }
+  .module-lesson .dur { font-size: 12px; color: var(--ink-3); }
+
+  /* ============ INSTRUCTOR ============ */
+  .instructor-block {
+    display: grid; grid-template-columns: 360px 1fr;
+    gap: 64px; align-items: center;
+  }
+  .instructor-photo {
+    aspect-ratio: 1/1.05;
+    border-radius: var(--r-lg);
+    background: linear-gradient(160deg, #1e293b, #334155);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+  .instructor-photo::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 35% 35%, rgba(13,89,242,.2), transparent 60%);
+  }
+  .instructor-photo .placeholder {
+    position: absolute; bottom: 16px; left: 16px;
+    font-size: 11px; color: rgba(255,255,255,.5);
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .instructor-text .kicker {
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .instructor-text h2 {
+    font-size: 36px; font-weight: 700; margin: 0 0 8px;
+    letter-spacing: -0.02em; color: var(--ink);
+  }
+  .instructor-text .role {
+    font-size: 15px; color: var(--ink-2); margin-bottom: 24px;
+  }
+  .instructor-text p {
+    font-size: 15px; line-height: 1.7; color: var(--ink-2);
+    margin: 0 0 20px;
+  }
+  .instructor-creds {
+    display: grid; gap: 12px;
+    margin-top: 24px;
+  }
+  .cred {
+    display: grid; grid-template-columns: 28px 1fr;
+    gap: 12px; align-items: flex-start;
+    font-size: 14px; color: var(--ink-2);
+  }
+  .cred .ms { color: var(--primary); font-size: 20px; }
+
+  /* ============ TESTIMONIALS ============ */
+  .reviews-section { background: var(--surface); }
+  .reviews {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  .review {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    display: flex; flex-direction: column;
+  }
+  .review .stars { color: var(--warn); margin-bottom: 14px; }
+  .review .stars .ms { font-size: 18px; }
+  .review p {
+    font-size: 14.5px; line-height: 1.6; color: var(--ink-2);
+    margin: 0 0 24px; flex: 1;
+  }
+  .review .who { display: flex; align-items: center; gap: 12px; }
+  .review .av {
+    width: 40px; height: 40px; border-radius: 999px;
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  }
+  .review .who .info { line-height: 1.3; }
+  .review .who .n { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .review .who .r { font-size: 12px; color: var(--ink-3); }
+
+  /* ============ PRICING CTA ============ */
+  .pricing-wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    background: var(--ink); color: white;
+    border-radius: 24px;
+    padding: 56px 56px;
+    display: grid; grid-template-columns: 1fr 320px;
+    gap: 48px; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .pricing-wrap::before {
+    content: ""; position: absolute;
+    right: -120px; top: -120px;
+    width: 320px; height: 320px; border-radius: 999px;
+    background: radial-gradient(circle, var(--primary), transparent 70%);
+    opacity: 0.4;
+  }
+  .pricing-wrap .kicker {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,.6);
+    margin-bottom: 14px;
+  }
+  .pricing-wrap h2 {
+    font-size: 36px; line-height: 1.15; font-weight: 700;
+    margin: 0 0 14px; letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .pricing-wrap p {
+    font-size: 15px; line-height: 1.6; color: rgba(255,255,255,.7); margin: 0 0 8px;
+  }
+  .price-card {
+    position: relative; z-index: 1;
+    background: var(--surface); color: var(--ink);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-md);
+  }
+  .price-card .badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 700;
+    color: var(--primary); background: var(--primary-soft);
+    padding: 4px 10px; border-radius: var(--r-full);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .price-card .price {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .price-card .amt { font-size: 38px; font-weight: 700; letter-spacing: -0.02em; }
+  .price-card .ccy { font-size: 16px; color: var(--ink-2); font-weight: 500; }
+  .price-card .strike {
+    font-size: 14px; color: var(--ink-3); text-decoration: line-through; margin-left: 4px;
+  }
+  .price-card .note { font-size: 12px; color: var(--ink-3); margin-bottom: 18px; }
+  .price-card .btn { width: 100%; justify-content: center; margin-top: 6px; }
+  .price-card ul { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
+  .price-card ul li {
+    display: grid; grid-template-columns: 18px 1fr;
+    gap: 8px; align-items: flex-start;
+    font-size: 13px; color: var(--ink-2);
+  }
+  .price-card ul li .ms { color: var(--done); font-size: 16px; margin-top: 2px; }
+
+  /* ============ FAQ ============ */
+  .faq-list { max-width: 760px; margin: 0 auto; display: grid; gap: 10px; }
+  .faq-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .faq-q {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px;
+    font-size: 15px; font-weight: 500; color: var(--ink);
+    text-align: left;
+    transition: background .15s;
+  }
+  .faq-q:hover { background: var(--line-2); }
+  .faq-q .ms { color: var(--ink-3); transition: transform .2s; }
+  .faq-item.open .faq-q .ms { transform: rotate(45deg); color: var(--primary); }
+  .faq-a {
+    display: none;
+    padding: 0 24px 22px;
+    font-size: 14px; line-height: 1.65; color: var(--ink-2);
+  }
+  .faq-item.open .faq-a { display: block; }
+
+  /* ============ FOOTER ============ */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+  .footer-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 48px 48px 32px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 48px;
+  }
+  .footer-brand h3 { font-size: 16px; font-weight: 700; margin: 0 0 10px; color: var(--ink); }
+  .footer-brand p { font-size: 13px; color: var(--ink-2); line-height: 1.6; margin: 0; max-width: 280px; }
+  .footer-col h4 {
+    font-size: 12px; font-weight: 700;
+    color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase;
+    margin: 0 0 14px;
+  }
+  .footer-col a {
+    display: block;
+    font-size: 13px; color: var(--ink-2);
+    text-decoration: none; padding: 4px 0;
+  }
+  .footer-col a:hover { color: var(--ink); text-decoration: none; }
+  .footer-bottom {
+    max-width: 1280px; margin: 0 auto;
+    padding: 20px 48px;
+    border-top: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--ink-3);
+  }
+  .footer-bottom .socials { display: flex; gap: 6px; }
+  .footer-bottom .socials .btn-icon { width: 32px; height: 32px; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1100px) {
+    .features, .reviews { grid-template-columns: repeat(2, 1fr); }
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { max-width: 480px; margin: 0 auto; }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); }
+    .instructor-block { grid-template-columns: 1fr; }
+    .pricing-wrap { grid-template-columns: 1fr; padding: 40px; }
+    .footer-inner { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .nav { padding: 12px 20px; }
+    .nav-menu { display: none; }
+    .section { padding: 64px 20px; }
+    .hero { padding: 48px 20px; }
+    .hero h1 { font-size: 36px; }
+    .section-head h2 { font-size: 28px; }
+    .features, .reviews { grid-template-columns: 1fr; }
+    .float-card { display: none; }
+    .stats-inner { grid-template-columns: 1fr 1fr; padding: 24px 20px; }
+    .footer-inner { padding: 32px 20px; grid-template-columns: 1fr 1fr; }
+    .footer-bottom { padding: 16px 20px; flex-direction: column; gap: 10px; }
+  }
+</style>
+</head>
+<body data-screen-label="01 Landing">
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="brand">
+      <div class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+        </svg>
+      </div>
+      <h2>CoffeeTree</h2>
+    </div>
+    <nav class="nav-menu" aria-label="Primary">
+      <a href="#curriculum">Khóa học</a>
+      <a href="#instructor">Giảng viên</a>
+      <a href="#reviews">Đánh giá</a>
+      <a href="#faq">Câu hỏi</a>
+    </nav>
+    <div class="nav-right">
+      <a href="#" class="nav-link">Đăng nhập</a>
+      <a href="#pricing" class="btn btn-primary btn-sm">Đăng ký ngay</a>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Khóa học mới · Khai giảng tháng 6</span>
+      <h1>Vận hành quán cà phê <span class="accent">từ A đến Z.</span></h1>
+      <p class="lead">
+        Học cách lên ý tưởng, set up, vận hành và phát triển một quán cà phê có lãi —
+        từ chọn mặt bằng, đào tạo barista, đến marketing và tài chính. Áp dụng được ngay.
+      </p>
+      <div class="hero-meta">
+        <div class="item"><span class="ms sm">schedule</span><strong>8 tuần</strong></div>
+        <div class="item"><span class="ms sm">play_circle</span><strong>42 bài học</strong></div>
+        <div class="item"><span class="ms sm">groups</span><strong>2.400+ học viên</strong></div>
+        <div class="item"><span class="ms sm">star</span><strong>4.9</strong> / 5.0</div>
+      </div>
+      <div class="hero-cta">
+        <a href="#pricing" class="btn btn-primary">
+          <span>Đăng ký khóa học</span>
+          <span class="ms">arrow_forward</span>
+        </a>
+        <a href="#" class="ghost">
+          <span class="play"><span class="ms fill">play_arrow</span></span>
+          <span>Xem giới thiệu (2:30)</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="visual-main">
+        <div class="visual-tag">[ Hero image · café operations ]</div>
+        <div class="visual-caption">
+          <div class="title">Cà phê Sương Mai</div>
+          <div class="sub">Quán mẫu của khóa học · Đà Lạt</div>
+        </div>
+      </div>
+      <div class="float-card tl">
+        <div class="icn"><span class="ms">trending_up</span></div>
+        <div class="info">
+          <div class="v">+38%</div>
+          <div class="l">Doanh thu / tháng</div>
+        </div>
+      </div>
+      <div class="float-card br">
+        <div class="icn"><span class="ms">verified</span></div>
+        <div class="info">
+          <div class="v">95%</div>
+          <div class="l">Áp dụng thực tế</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="stats">
+    <div class="stats-inner">
+      <div class="stat"><div class="num">2,400+</div><div class="lbl">Học viên đã tham gia</div></div>
+      <div class="stat"><div class="num">86</div><div class="lbl">Quán đã mở sau khóa học</div></div>
+      <div class="stat"><div class="num">18</div><div class="lbl">Chuyên gia chia sẻ</div></div>
+      <div class="stat"><div class="num">4.9 / 5</div><div class="lbl">Đánh giá trung bình</div></div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="section" id="learn">
+    <div class="section-head">
+      <div class="kicker">Bạn sẽ học được</div>
+      <h2>Vận hành quán bằng hệ thống, không bằng cảm tính.</h2>
+      <p>Sáu trụ cột giúp bạn đi từ một ý tưởng đến một quán cà phê vận hành ổn định, có lợi nhuận và có thương hiệu rõ ràng.</p>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="icn"><span class="ms">storefront</span></div>
+        <h3>Lựa chọn mặt bằng &amp; concept</h3>
+        <p>Khảo sát khu vực, đọc dòng khách, tính P&amp;L sơ bộ trước khi ký hợp đồng. Concept theo phân khúc rõ ràng.</p>
+      </div>
+      <div class="feature">
+        <div class="icn"><span class="ms">coffee</span></div>
+        <h3>Menu &amp; định lượng</h3>
+        <p>Thiết kế menu xoay quanh chi phí thực, định lượng chuẩn cho mọi món, chiến lược giá theo phân khúc.</p>
+      </div>
+      <div class="feature">
+        <div class="icn"><span class="ms">badge</span></div>
+        <h3>Tuyển &amp; đào tạo nhân sự</h3>
+        <p>Quy trình tuyển barista &amp; phục vụ, lộ trình đào tạo 30 ngày, KPI và cách giữ chân nhân viên giỏi.</p>
+      </div>
+      <div class="feature">
+        <div class="icn"><span class="ms">payments</span></div>
+        <h3>Tài chính &amp; dòng tiền</h3>
+        <p>Lập dự toán mở quán, theo dõi dòng tiền hằng ngày, đọc báo cáo P&amp;L để ra quyết định nhanh.</p>
+      </div>
+      <div class="feature">
+        <div class="icn"><span class="ms">campaign</span></div>
+        <h3>Marketing &amp; thương hiệu</h3>
+        <p>Câu chuyện thương hiệu, nội dung social, chương trình loyalty và cách giữ khách quay lại lần 3.</p>
+      </div>
+      <div class="feature">
+        <div class="icn"><span class="ms">insights</span></div>
+        <h3>Mở rộng &amp; chuẩn hóa</h3>
+        <p>Khi nào nên mở quán thứ 2, cách viết SOP để chi nhánh nào cũng cho ra cùng một ly cà phê.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CURRICULUM ============ -->
+  <section class="section curriculum-section" id="curriculum" style="background: var(--surface);">
+    <div class="section-head">
+      <div class="kicker">Chương trình học</div>
+      <h2>8 module · 42 bài học · ~24 giờ video</h2>
+      <p>Nhấp vào từng module để xem các bài học bên trong. Bạn được học theo nhịp của mình, kèm bài tập áp dụng vào quán thật.</p>
+    </div>
+
+    <div class="curriculum">
+      <!-- Module 1 -->
+      <div class="module-row open">
+        <button class="module-head">
+          <div class="module-num">01</div>
+          <div class="module-info">
+            <div class="ttl">Định hình ý tưởng &amp; mô hình quán</div>
+            <div class="sub">Tìm thị trường ngách, định nghĩa "vì sao khách chọn bạn" thay vì hàng xóm.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>5 bài</span>
+            <span><span class="ms">schedule</span>1g 50p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+        <div class="module-body">
+          <div class="module-lesson"><span class="ms">play_circle</span><span class="name">Phân tích 4 mô hình quán cà phê phổ biến</span><span class="dur">22:10</span></div>
+          <div class="module-lesson"><span class="ms">play_circle</span><span class="name">Khảo sát khu vực &amp; đọc hành vi khách</span><span class="dur">18:45</span></div>
+          <div class="module-lesson"><span class="ms">description</span><span class="name">Worksheet: Vẽ chân dung khách lý tưởng</span><span class="dur">10p</span></div>
+          <div class="module-lesson"><span class="ms">play_circle</span><span class="name">Định vị thương hiệu trong 1 câu</span><span class="dur">14:20</span></div>
+          <div class="module-lesson"><span class="ms">quiz</span><span class="name">Quiz: Mô hình của bạn đã rõ chưa?</span><span class="dur">8 câu</span></div>
+        </div>
+      </div>
+
+      <!-- Module 2 -->
+      <div class="module-row">
+        <button class="module-head">
+          <div class="module-num">02</div>
+          <div class="module-info">
+            <div class="ttl">Mặt bằng, thiết kế &amp; bếp</div>
+            <div class="sub">Cách đọc hợp đồng thuê, layout quầy bar và bếp tối ưu cho 1 ca 3 người.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>6 bài</span>
+            <span><span class="ms">schedule</span>2g 40p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+      </div>
+
+      <!-- Module 3 -->
+      <div class="module-row">
+        <button class="module-head">
+          <div class="module-num">03</div>
+          <div class="module-info">
+            <div class="ttl">Menu, định lượng &amp; giá bán</div>
+            <div class="sub">Định lượng chuẩn cho 24 món gốc, tính cost &amp; chọn margin theo phân khúc.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>5 bài</span>
+            <span><span class="ms">schedule</span>2g 10p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+      </div>
+
+      <!-- Module 4 -->
+      <div class="module-row">
+        <button class="module-head">
+          <div class="module-num">04</div>
+          <div class="module-info">
+            <div class="ttl">Nhân sự, ca làm &amp; đào tạo</div>
+            <div class="sub">Tuyển dụng, onboarding 30 ngày, sắp xếp ca và KPI cho từng vị trí.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>6 bài</span>
+            <span><span class="ms">schedule</span>3g 05p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+      </div>
+
+      <!-- Module 5 -->
+      <div class="module-row">
+        <button class="module-head">
+          <div class="module-num">05</div>
+          <div class="module-info">
+            <div class="ttl">Tài chính, kho &amp; nhà cung cấp</div>
+            <div class="sub">Theo dõi dòng tiền hằng ngày, kiểm kho, đàm phán với supplier &amp; đọc P&amp;L.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>5 bài</span>
+            <span><span class="ms">schedule</span>2g 30p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+      </div>
+
+      <!-- Module 6 -->
+      <div class="module-row">
+        <button class="module-head">
+          <div class="module-num">06</div>
+          <div class="module-info">
+            <div class="ttl">Marketing, social &amp; loyalty</div>
+            <div class="sub">Nội dung tuần đầu, content lịch theo mùa, chương trình quay lại lần 3.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>5 bài</span>
+            <span><span class="ms">schedule</span>2g 20p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+      </div>
+
+      <!-- Module 7 -->
+      <div class="module-row">
+        <button class="module-head">
+          <div class="module-num">07</div>
+          <div class="module-info">
+            <div class="ttl">Trải nghiệm khách &amp; chất lượng</div>
+            <div class="sub">SOP phục vụ, xử lý phàn nàn, đo lường NPS và cải thiện vòng lặp khách.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>4 bài</span>
+            <span><span class="ms">schedule</span>1g 50p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+      </div>
+
+      <!-- Module 8 -->
+      <div class="module-row">
+        <button class="module-head">
+          <div class="module-num">08</div>
+          <div class="module-info">
+            <div class="ttl">Mở rộng &amp; chuẩn hóa thương hiệu</div>
+            <div class="sub">Quy trình đánh giá mở chi nhánh, hệ thống SOP, và kế hoạch 12 tháng tiếp theo.</div>
+          </div>
+          <div class="module-stats">
+            <span><span class="ms">play_circle</span>6 bài</span>
+            <span><span class="ms">schedule</span>2g 50p</span>
+          </div>
+          <span class="ms toggle">expand_more</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INSTRUCTOR ============ -->
+  <section class="section" id="instructor">
+    <div class="instructor-block">
+      <div class="instructor-photo">
+        <div class="placeholder">[ Instructor portrait ]</div>
+      </div>
+      <div class="instructor-text">
+        <div class="kicker">Giảng viên chính</div>
+        <h2>Trần Minh Hoàng</h2>
+        <div class="role">Founder · CoffeeTree · 12 năm trong ngành F&amp;B</div>
+        <p>
+          Minh từng vận hành 7 quán cà phê tại TP. HCM và Đà Lạt, đào tạo hơn 200 chủ
+          quán trong 4 năm qua. Khóa học này là toàn bộ những gì anh ước đã có khi mở
+          quán đầu tiên năm 23 tuổi.
+        </p>
+        <p>
+          "Mở quán không khó. Vận hành để có lãi và không kiệt sức — đó mới là việc cả
+          đời học. Khóa học đưa ra hệ thống, các bạn đưa cá tính."
+        </p>
+        <div class="instructor-creds">
+          <div class="cred"><span class="ms">verified</span><span>Chứng chỉ SCA Barista Skills &amp; Brewing — Foundation + Intermediate.</span></div>
+          <div class="cred"><span class="ms">storefront</span><span>Đồng sáng lập 3 thương hiệu cà phê tại TP. HCM và Đà Lạt từ 2014.</span></div>
+          <div class="cred"><span class="ms">school</span><span>Diễn giả khách mời tại Vietnam Coffee Festival, RMIT F&amp;B Talks.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REVIEWS ============ -->
+  <section class="section reviews-section" id="reviews" style="background: var(--surface);">
+    <div class="section-head">
+      <div class="kicker">Học viên nói gì</div>
+      <h2>Hơn 2.400 người đã đi qua khóa học.</h2>
+      <p>Đây là một vài câu chuyện thật từ những người đã mở hoặc cải tổ quán của họ sau khi học.</p>
+    </div>
+
+    <div class="reviews">
+      <div class="review">
+        <div class="stars">
+          <span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span>
+        </div>
+        <p>"Trước đây mình mở quán theo cảm tính, làm 8 tháng vẫn lỗ. Sau module 5 mình mới hiểu đọc dòng tiền là gì. Giờ quán đã hòa vốn và có 2 nhân viên ổn định."</p>
+        <div class="who">
+          <div class="av"></div>
+          <div class="info">
+            <div class="n">Nguyễn Thị Hà</div>
+            <div class="r">Chủ Tiệm cà phê Nhỏ · Quận 7</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review">
+        <div class="stars">
+          <span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span>
+        </div>
+        <p>"Phần đào tạo nhân sự cứu mình. Trước đây 3 tháng đổi 1 barista. Áp dụng quy trình onboarding 30 ngày — đội hiện tại đã đi với mình 14 tháng và còn tự đào tạo bạn mới."</p>
+        <div class="who">
+          <div class="av"></div>
+          <div class="info">
+            <div class="n">Lê Quang Vinh</div>
+            <div class="r">Founder · The Slow Bar Đà Nẵng</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review">
+        <div class="stars">
+          <span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star</span><span class="ms fill">star_half</span>
+        </div>
+        <p>"Mình từng học 4 khóa khác. Khóa này khác ở chỗ có worksheet áp dụng ngay vào quán mình, không chỉ lý thuyết. Module mặt bằng giúp mình đổi địa điểm trước khi ký, tiết kiệm hơn 200 triệu."</p>
+        <div class="who">
+          <div class="av"></div>
+          <div class="info">
+            <div class="n">Phạm Mai Anh</div>
+            <div class="r">Sắp mở quán đầu tiên · Hà Nội</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section class="section" id="pricing">
+    <div class="pricing-wrap">
+      <div>
+        <div class="kicker">Đăng ký khóa học</div>
+        <h2>Bắt đầu mở quán có hệ thống, ngay tuần này.</h2>
+        <p>Truy cập trọn đời, học theo nhịp của bạn, kèm cộng đồng riêng và 4 buổi Q&amp;A trực tiếp mỗi tháng với giảng viên.</p>
+        <p style="margin-top: 18px; color: rgba(255,255,255,.85);">Bạn có 14 ngày dùng thử — hoàn 100% nếu thấy không phù hợp.</p>
+      </div>
+      <div class="price-card">
+        <div class="badge">Khai giảng tháng 6</div>
+        <div class="price">
+          <span class="amt">3.900.000</span>
+          <span class="ccy">₫</span>
+        </div>
+        <div class="note">Giá gốc <span style="text-decoration: line-through;">5.500.000₫</span> · Ưu đãi hết 30/06</div>
+        <a href="#" class="btn btn-primary">
+          <span>Đăng ký ngay</span>
+          <span class="ms">arrow_forward</span>
+        </a>
+        <ul>
+          <li><span class="ms fill">check_circle</span><span>42 bài học · 24 giờ video</span></li>
+          <li><span class="ms fill">check_circle</span><span>Worksheet &amp; template thực tế</span></li>
+          <li><span class="ms fill">check_circle</span><span>Cộng đồng học viên riêng</span></li>
+          <li><span class="ms fill">check_circle</span><span>Q&amp;A trực tiếp hàng tháng</span></li>
+          <li><span class="ms fill">check_circle</span><span>Chứng chỉ hoàn thành</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section" id="faq" style="padding-top: 32px;">
+    <div class="section-head">
+      <div class="kicker">Câu hỏi thường gặp</div>
+      <h2>Bạn đang phân vân điều gì?</h2>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item open">
+        <button class="faq-q">
+          <span>Tôi chưa từng làm F&amp;B, có học được không?</span>
+          <span class="ms">add</span>
+        </button>
+        <div class="faq-a">
+          Hoàn toàn được. Khóa học được thiết kế cho người bắt đầu từ con số 0. Hai module
+          đầu chỉ tập trung vào tư duy &amp; mô hình. Bạn không cần biết pha cà phê trước khi vào học.
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">
+          <span>Tôi sắp mở quán trong tháng tới, kịp học không?</span>
+          <span class="ms">add</span>
+        </button>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">
+          <span>Khóa học có giúp được người đang vận hành quán cũ không?</span>
+          <span class="ms">add</span>
+        </button>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">
+          <span>Tôi có được truy cập trọn đời không?</span>
+          <span class="ms">add</span>
+        </button>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">
+          <span>Tôi có thể trả góp hoặc xuất hóa đơn công ty?</span>
+          <span class="ms">add</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>CoffeeTree</h3>
+        <p>Học viện vận hành quán cà phê — nơi chủ quán Việt Nam học cách làm việc với hệ thống thay vì cảm tính.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Khóa học</h4>
+        <a href="#">Vận hành quán cà phê</a>
+        <a href="#">Barista Foundation</a>
+        <a href="#">Tài chính F&amp;B</a>
+        <a href="#">Marketing quán nhỏ</a>
+      </div>
+      <div class="footer-col">
+        <h4>Học viện</h4>
+        <a href="#">Về CoffeeTree</a>
+        <a href="#">Giảng viên</a>
+        <a href="#">Câu chuyện học viên</a>
+        <a href="#">Tuyển dụng</a>
+      </div>
+      <div class="footer-col">
+        <h4>Hỗ trợ</h4>
+        <a href="#">Trung tâm trợ giúp</a>
+        <a href="#">Liên hệ</a>
+        <a href="#">Điều khoản</a>
+        <a href="#">Chính sách bảo mật</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CoffeeTree Academy · Made in Vietnam</span>
+      <div class="socials">
+        <button class="btn-icon" aria-label="Facebook"><span class="ms sm">facebook</span></button>
+        <button class="btn-icon" aria-label="Instagram"><span class="ms sm">photo_camera</span></button>
+        <button class="btn-icon" aria-label="YouTube"><span class="ms sm">smart_display</span></button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Module expand/collapse
+    document.querySelectorAll('.module-head').forEach(head => {
+      head.addEventListener('click', () => {
+        head.parentElement.classList.toggle('open');
+      });
+    });
+    // FAQ
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+    });
+  </script>
+</body>
+</html>

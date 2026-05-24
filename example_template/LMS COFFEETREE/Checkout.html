@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Thanh toán — CoffeeTree</title>
+<link rel="stylesheet" href="styles/design-system.css" />
+<style>
+  /* ============ THIN TOP BAR ============ */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar .brand { display: flex; align-items: center; gap: 10px; }
+  .topbar .brand h2 { font-size: 16px; font-weight: 700; margin: 0; }
+  .secure-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--ink-2);
+    padding: 6px 12px;
+    background: var(--line-2);
+    border-radius: var(--r-full);
+  }
+  .secure-tag .ms { font-size: 14px; color: var(--done); }
+  .help-link {
+    color: var(--primary); font-size: 13px; font-weight: 500;
+    text-decoration: none; margin-left: 8px;
+  }
+
+  /* ============ STEPPER ============ */
+  .stepper {
+    max-width: 1100px; margin: 0 auto;
+    padding: 32px 32px 8px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .step { display: flex; align-items: center; gap: 10px; }
+  .step .num {
+    width: 28px; height: 28px; border-radius: 999px;
+    background: var(--line); color: var(--ink-3);
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .step.done .num { background: var(--done); color: white; }
+  .step.active .num { background: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(13,89,242,.18); }
+  .step .lbl { font-size: 13px; color: var(--ink-3); font-weight: 500; }
+  .step.done .lbl, .step.active .lbl { color: var(--ink); font-weight: 700; }
+  .step-divider {
+    flex: 1; height: 2px; background: var(--line); border-radius: 2px;
+    max-width: 80px;
+  }
+  .step-divider.done { background: var(--done); }
+
+  /* ============ MAIN ============ */
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 32px 64px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .page h1 {
+    font-size: 28px; font-weight: 700;
+    color: var(--ink); letter-spacing: -0.02em;
+    margin: 0 0 8px;
+  }
+  .page .lead {
+    font-size: 14px; color: var(--ink-2); margin: 0 0 32px;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .panel-head {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px;
+  }
+  .panel-head .num {
+    width: 26px; height: 26px; border-radius: 999px;
+    background: var(--primary-soft); color: var(--primary);
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .panel-head h3 {
+    font-size: 16px; font-weight: 700; margin: 0; color: var(--ink);
+  }
+
+  /* ---- Form ---- */
+  .form-row { display: grid; gap: 14px; margin-bottom: 12px; }
+  .form-row.two { grid-template-columns: 1fr 1fr; }
+  .form-group { display: grid; gap: 6px; }
+  .form-group label {
+    font-size: 13px; font-weight: 500; color: var(--ink);
+  }
+  .input-wrap { position: relative; }
+  .input-wrap .ms {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--ink-3); font-size: 18px; pointer-events: none;
+  }
+  .input-wrap .field { padding-left: 42px; }
+  .checkbox {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--ink-2); cursor: pointer;
+    user-select: none; margin-top: 8px;
+  }
+  .checkbox input { position: absolute; opacity: 0; pointer-events: none; }
+  .checkbox .box {
+    width: 18px; height: 18px; border-radius: 4px;
+    border: 1.5px solid var(--line); background: var(--surface);
+    display: grid; place-items: center;
+    transition: background .15s, border-color .15s;
+  }
+  .checkbox .box .ms { font-size: 14px; color: white; opacity: 0; }
+  .checkbox input:checked + .box {
+    background: var(--primary); border-color: var(--primary);
+  }
+  .checkbox input:checked + .box .ms { opacity: 1; }
+
+  /* ---- Payment methods ---- */
+  .pay-methods { display: grid; gap: 10px; }
+  .pay-option {
+    display: grid;
+    grid-template-columns: 20px 44px 1fr auto;
+    gap: 14px; align-items: center;
+    padding: 16px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .pay-option:hover { border-color: var(--ink-3); }
+  .pay-option input { position: absolute; opacity: 0; pointer-events: none; }
+  .pay-option .radio {
+    width: 18px; height: 18px; border-radius: 999px;
+    border: 1.5px solid var(--line);
+    display: grid; place-items: center;
+  }
+  .pay-option .radio::after {
+    content: ""; width: 8px; height: 8px; border-radius: 999px;
+    background: var(--primary); opacity: 0;
+    transition: opacity .15s;
+  }
+  .pay-option.selected {
+    border-color: var(--primary);
+    background: rgba(13,89,242,0.025);
+  }
+  .pay-option.selected .radio { border-color: var(--primary); }
+  .pay-option.selected .radio::after { opacity: 1; }
+  .pay-option .logo {
+    width: 44px; height: 32px;
+    border-radius: var(--r-sm);
+    background: var(--line-2);
+    display: grid; place-items: center;
+    font-size: 11px; font-weight: 700; color: var(--ink-2);
+    letter-spacing: 0.04em;
+  }
+  .pay-option .logo.vnpay { background: #004899; color: white; }
+  .pay-option .logo.momo  { background: #ae2070; color: white; }
+  .pay-option .logo.zalo  { background: #0068ff; color: white; }
+  .pay-option .logo.card  {
+    background: linear-gradient(135deg, #0f172a, #334155);
+    color: white;
+    position: relative;
+  }
+  .pay-option .logo.card::before {
+    content: ""; position: absolute; top: 5px; left: 5px;
+    width: 8px; height: 6px; background: #fbbf24; border-radius: 1px;
+  }
+  .pay-option .logo.bank { background: var(--done); color: white; }
+  .pay-option .info .t { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .pay-option .info .s { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .pay-option .extra { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+
+  .pay-extras {
+    margin-top: 14px;
+    padding: 16px;
+    background: var(--line-2);
+    border-radius: var(--r-md);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  /* Card form (when selected) */
+  .card-form {
+    margin-top: 14px;
+    padding: 18px;
+    background: var(--line-2);
+    border-radius: var(--r-md);
+    display: none;
+    grid-gap: 12px;
+  }
+  .card-form.show { display: grid; }
+  .card-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ============ SIDEBAR ORDER SUMMARY ============ */
+  aside {
+    position: sticky; top: 90px;
+  }
+  .order-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .order-head {
+    padding: 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .order-head h3 { font-size: 16px; font-weight: 700; margin: 0; }
+  .order-head .edit { font-size: 12px; color: var(--primary); text-decoration: none; font-weight: 500; }
+  .order-item {
+    padding: 18px 20px;
+    display: grid; grid-template-columns: 72px 1fr;
+    gap: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .order-item .thumb {
+    aspect-ratio: 1/1;
+    border-radius: var(--r-md);
+    background: linear-gradient(135deg, #1e293b, #334155);
+    position: relative; overflow: hidden;
+  }
+  .order-item .thumb::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(13,89,242,.25), transparent 65%);
+  }
+  .order-item .info .label {
+    font-size: 11px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .order-item .info .t { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.35; }
+  .order-item .info .s { font-size: 12px; color: var(--ink-3); margin-top: 6px; display: flex; gap: 10px; }
+  .order-item .info .s span { display: inline-flex; align-items: center; gap: 4px; }
+  .order-item .info .s .ms { font-size: 13px; }
+
+  .coupon {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .coupon .row {
+    display: flex; gap: 8px;
+  }
+  .coupon .field { height: 40px; font-size: 13px; }
+  .coupon .btn { height: 40px; padding: 0 14px; font-size: 12px; flex-shrink: 0; }
+  .coupon-applied {
+    margin-top: 10px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+    padding: 8px 12px;
+    background: var(--done-soft); color: var(--done);
+    border-radius: var(--r-md);
+  }
+  .coupon-applied .ms { font-size: 16px; }
+  .coupon-applied strong { font-weight: 700; }
+  .coupon-applied .remove {
+    margin-left: auto; color: var(--done); cursor: pointer;
+    font-size: 14px;
+  }
+
+  .totals {
+    padding: 18px 20px;
+  }
+  .totals .line {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0;
+    font-size: 14px; color: var(--ink-2);
+  }
+  .totals .line.discount { color: var(--done); }
+  .totals .total {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-top: 12px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .totals .total .lbl { font-size: 14px; color: var(--ink); font-weight: 700; }
+  .totals .total .amt {
+    font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em;
+  }
+  .totals .total .amt .ccy { font-size: 13px; color: var(--ink-3); font-weight: 500; margin-left: 2px; }
+  .savings {
+    margin-top: 8px;
+    font-size: 12px; color: var(--ink-3);
+    text-align: right;
+  }
+  .savings strong { color: var(--done); font-weight: 700; }
+
+  .order-foot {
+    padding: 16px 20px 20px;
+    border-top: 1px solid var(--line);
+  }
+  .order-foot .btn-pay {
+    width: 100%;
+    height: 50px;
+    background: var(--primary); color: white;
+    border-radius: var(--r-md);
+    font-weight: 700; font-size: 14px;
+    box-shadow: var(--shadow-cta);
+    cursor: pointer; border: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background .15s;
+  }
+  .order-foot .btn-pay:hover { background: var(--primary-hover); }
+
+  .trust-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    margin-top: 16px;
+  }
+  .trust {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--ink-3);
+    line-height: 1.4;
+  }
+  .trust .ms { font-size: 16px; color: var(--done); flex-shrink: 0; }
+
+  .legal {
+    margin-top: 14px;
+    font-size: 11px; line-height: 1.5;
+    color: var(--ink-3);
+    text-align: center;
+  }
+  .legal a { color: var(--ink-2); text-decoration: none; }
+  .legal a:hover { text-decoration: underline; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 960px) {
+    .page { grid-template-columns: 1fr; padding: 20px; }
+    aside { position: static; }
+    .stepper { padding: 24px 20px 0; flex-wrap: wrap; }
+    .step-divider { display: none; }
+  }
+</style>
+</head>
+<body data-screen-label="01 Checkout">
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+        </svg>
+      </div>
+      <h2>CoffeeTree</h2>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span class="secure-tag"><span class="ms">lock</span>Thanh toán an toàn · mã hóa SSL</span>
+      <a href="#" class="help-link">Cần trợ giúp?</a>
+    </div>
+  </header>
+
+  <!-- ============ STEPPER ============ -->
+  <div class="stepper">
+    <div class="step done">
+      <div class="num"><span class="ms" style="font-size:14px;">check</span></div>
+      <div class="lbl">Giỏ hàng</div>
+    </div>
+    <div class="step-divider done"></div>
+    <div class="step active">
+      <div class="num">2</div>
+      <div class="lbl">Thanh toán</div>
+    </div>
+    <div class="step-divider"></div>
+    <div class="step">
+      <div class="num">3</div>
+      <div class="lbl">Hoàn tất</div>
+    </div>
+  </div>
+
+  <!-- ============ PAGE ============ -->
+  <div class="page">
+
+    <!-- LEFT — checkout form -->
+    <section>
+      <h1>Thanh toán</h1>
+      <p class="lead">Hoàn tất đơn hàng — bạn sẽ vào học ngay sau khi thanh toán thành công.</p>
+
+      <!-- Step 1 — Contact -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="num">1</div>
+          <h3>Thông tin liên hệ</h3>
+        </div>
+        <div class="form-row two">
+          <div class="form-group">
+            <label for="firstName">Họ</label>
+            <div class="input-wrap">
+              <span class="ms">person</span>
+              <input class="field" type="text" id="firstName" value="Nguyễn" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Tên</label>
+            <div class="input-wrap">
+              <span class="ms">badge</span>
+              <input class="field" type="text" id="lastName" value="Minh" />
+            </div>
+          </div>
+        </div>
+        <div class="form-row two">
+          <div class="form-group">
+            <label for="email">Email nhận hóa đơn</label>
+            <div class="input-wrap">
+              <span class="ms">mail</span>
+              <input class="field" type="email" id="email" value="minh@email.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="phone">Số điện thoại</label>
+            <div class="input-wrap">
+              <span class="ms">call</span>
+              <input class="field" type="tel" id="phone" value="0901 234 567" />
+            </div>
+          </div>
+        </div>
+        <label class="checkbox">
+          <input type="checkbox" />
+          <span class="box"><span class="ms fill">check</span></span>
+          <span>Xuất hóa đơn VAT cho công ty</span>
+        </label>
+      </div>
+
+      <!-- Step 2 — Payment method -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="num">2</div>
+          <h3>Phương thức thanh toán</h3>
+        </div>
+
+        <div class="pay-methods">
+          <label class="pay-option selected" data-pay="vnpay">
+            <input type="radio" name="pay" checked />
+            <div class="logo vnpay">VNPay</div>
+            <div></div>
+            <div></div>
+            <div class="info" style="grid-column: 3; grid-row: 1;">
+              <div class="t">Cổng VNPay</div>
+              <div class="s">Internet Banking, ATM, QR Code · 40+ ngân hàng</div>
+            </div>
+            <div class="radio" style="grid-column: 1; grid-row: 1;"></div>
+            <span class="extra" style="grid-column: 4; grid-row: 1;">Phổ biến</span>
+          </label>
+
+          <label class="pay-option" data-pay="momo">
+            <input type="radio" name="pay" />
+            <div class="radio"></div>
+            <div class="logo momo">Momo</div>
+            <div class="info">
+              <div class="t">Ví Momo</div>
+              <div class="s">Thanh toán bằng ví Momo, mở app quét QR</div>
+            </div>
+            <span class="extra"></span>
+          </label>
+
+          <label class="pay-option" data-pay="zalo">
+            <input type="radio" name="pay" />
+            <div class="radio"></div>
+            <div class="logo zalo">ZaloP</div>
+            <div class="info">
+              <div class="t">ZaloPay</div>
+              <div class="s">Hoàn 5% giá trị đơn hàng (tối đa 100.000₫)</div>
+            </div>
+            <span class="extra">Hoàn 5%</span>
+          </label>
+
+          <label class="pay-option" data-pay="card">
+            <input type="radio" name="pay" />
+            <div class="radio"></div>
+            <div class="logo card"></div>
+            <div class="info">
+              <div class="t">Thẻ tín dụng / ghi nợ quốc tế</div>
+              <div class="s">Visa, Mastercard, JCB · Thanh toán 1 lần hoặc trả góp 0%</div>
+            </div>
+            <span class="extra">Trả góp</span>
+          </label>
+
+          <label class="pay-option" data-pay="bank">
+            <input type="radio" name="pay" />
+            <div class="radio"></div>
+            <div class="logo bank">CK</div>
+            <div class="info">
+              <div class="t">Chuyển khoản ngân hàng</div>
+              <div class="s">Chuyển khoản thủ công · kích hoạt trong 2 giờ làm việc</div>
+            </div>
+            <span class="extra"></span>
+          </label>
+        </div>
+
+        <!-- Card form (hidden until selected) -->
+        <div class="card-form" id="cardForm">
+          <div class="form-group">
+            <label for="cardNumber">Số thẻ</label>
+            <div class="input-wrap">
+              <span class="ms">credit_card</span>
+              <input class="field" type="text" id="cardNumber" placeholder="1234 5678 9012 3456" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label for="cardExp">Ngày hết hạn</label>
+              <input class="field" type="text" id="cardExp" placeholder="MM / YY" />
+            </div>
+            <div class="form-group">
+              <label for="cardCvv">CVV</label>
+              <input class="field" type="text" id="cardCvv" placeholder="•••" />
+            </div>
+          </div>
+        </div>
+
+        <div class="pay-extras">
+          <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 500;">
+            <span class="ms sm">shield</span>
+            Mọi giao dịch được mã hóa SSL 256-bit
+          </span>
+          <span style="margin: 0 6px;">·</span>
+          Cam kết hoàn 100% nếu hủy trong 14 ngày đầu, không cần lý do.
+        </div>
+      </div>
+
+      <!-- Step 3 — Terms -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="num">3</div>
+          <h3>Xác nhận</h3>
+        </div>
+        <label class="checkbox" style="margin-top: 0; align-items: flex-start;">
+          <input type="checkbox" checked />
+          <span class="box"><span class="ms fill">check</span></span>
+          <span style="line-height: 1.5;">Tôi đồng ý với <a href="#" style="color: var(--primary); font-weight: 500;">Điều khoản dịch vụ</a> và <a href="#" style="color: var(--primary); font-weight: 500;">Chính sách hoàn tiền</a> của CoffeeTree Academy.</span>
+        </label>
+        <label class="checkbox" style="margin-top: 12px; align-items: flex-start;">
+          <input type="checkbox" />
+          <span class="box"><span class="ms fill">check</span></span>
+          <span style="line-height: 1.5;">Nhận newsletter — mẹo vận hành quán &amp; thông báo khóa học mới (1–2 email mỗi tháng).</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- RIGHT — order summary -->
+    <aside>
+      <div class="order-card">
+        <div class="order-head">
+          <h3>Đơn hàng của bạn</h3>
+          <a href="#" class="edit">Chỉnh sửa</a>
+        </div>
+
+        <div class="order-item">
+          <div class="thumb"></div>
+          <div class="info">
+            <div class="label">Vận hành · 8 tuần</div>
+            <div class="t">Vận hành quán cà phê từ A đến Z</div>
+            <div class="s">
+              <span><span class="ms">play_circle</span>42 bài</span>
+              <span><span class="ms">schedule</span>24 giờ</span>
+              <span><span class="ms">all_inclusive</span>Trọn đời</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="coupon">
+          <div class="row">
+            <input class="field" type="text" placeholder="Mã giảm giá" value="MOPHANCAFE" />
+            <button class="btn btn-secondary">Áp dụng</button>
+          </div>
+          <div class="coupon-applied">
+            <span class="ms">verified</span>
+            <span>Mã <strong>MOPHANCAFE</strong> đã áp dụng — giảm 1.600.000₫</span>
+            <span class="remove"><span class="ms sm">close</span></span>
+          </div>
+        </div>
+
+        <div class="totals">
+          <div class="line">
+            <span>Giá khóa học</span>
+            <span style="color: var(--ink);">5.500.000₫</span>
+          </div>
+          <div class="line discount">
+            <span>Giảm giá (MOPHANCAFE)</span>
+            <span>−1.600.000₫</span>
+          </div>
+          <div class="line">
+            <span>Thuế VAT (đã bao gồm)</span>
+            <span style="color: var(--ink-3);">—</span>
+          </div>
+          <div class="total">
+            <span class="lbl">Tổng thanh toán</span>
+            <span class="amt">3.900.000<span class="ccy">₫</span></span>
+          </div>
+          <div class="savings">Bạn tiết kiệm <strong>1.600.000₫</strong></div>
+        </div>
+
+        <div class="order-foot">
+          <a href="Payment Success.html" class="btn-pay">
+            <span class="ms">lock</span>
+            <span>Thanh toán 3.900.000₫</span>
+          </a>
+
+          <div class="trust-row">
+            <div class="trust"><span class="ms">verified_user</span>Hoàn 100% trong 14 ngày</div>
+            <div class="trust"><span class="ms">shield</span>Mã hóa SSL 256-bit</div>
+            <div class="trust"><span class="ms">all_inclusive</span>Truy cập trọn đời</div>
+            <div class="trust"><span class="ms">workspace_premium</span>Chứng chỉ hoàn thành</div>
+          </div>
+
+          <div class="legal">
+            Bằng việc thanh toán, bạn đồng ý với <a href="#">Điều khoản</a> &amp; <a href="#">Chính sách bảo mật</a> của CoffeeTree.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script>
+    // Toggle payment options
+    document.querySelectorAll('.pay-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.pay-option.selected').forEach(s => s.classList.remove('selected'));
+        opt.classList.add('selected');
+        const radio = opt.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+        const isCard = opt.dataset.pay === 'card';
+        document.getElementById('cardForm').classList.toggle('show', isCard);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cẩm nang vận hành — CoffeeTree</title>
+<link rel="stylesheet" href="styles/design-system.css" />
+<style>
+  /* ============ NAV ============ */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px;
+    padding: 14px 48px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav .brand { display: flex; align-items: center; gap: 10px; }
+  .nav .brand h2 { font-size: 16px; font-weight: 700; margin: 0; }
+  .nav-menu { display: flex; gap: 2px; margin-left: 16px; }
+  .nav-menu a {
+    padding: 8px 14px; border-radius: var(--r-md);
+    font-size: 14px; font-weight: 500;
+    color: var(--ink-2); text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .nav-menu a:hover { background: var(--line-2); color: var(--ink); }
+  .nav-menu a.active { background: var(--primary-soft); color: var(--primary); font-weight: 700; }
+  .nav-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .nav-link {
+    padding: 8px 14px;
+    color: var(--ink-2); font-size: 13px; font-weight: 500;
+    text-decoration: none;
+  }
+
+  /* ============ PAGE HEAD ============ */
+  .page-head {
+    max-width: 1320px; margin: 0 auto;
+    padding: 40px 48px 24px;
+    display: grid; grid-template-columns: 1fr auto; gap: 32px;
+    align-items: end;
+  }
+  .page-head .title-block .kicker {
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .page-head h1 {
+    font-size: 40px; font-weight: 700;
+    color: var(--ink); letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  .page-head p {
+    font-size: 15px; line-height: 1.6; color: var(--ink-2);
+    margin: 0; max-width: 600px;
+  }
+  .page-head .search {
+    display: flex; align-items: center; gap: 10px;
+    width: 320px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .page-head .search:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13,89,242,.12);
+  }
+  .page-head .search .ms { color: var(--ink-3); font-size: 18px; }
+  .page-head .search input {
+    flex: 1; border: none; background: none; outline: none;
+    font-family: inherit; font-size: 13.5px; color: var(--ink);
+  }
+
+  /* ============ CATEGORY TABS ============ */
+  .cats-wrap {
+    max-width: 1320px; margin: 0 auto;
+    padding: 0 48px;
+  }
+  .cats {
+    display: flex; gap: 4px;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cats::-webkit-scrollbar { display: none; }
+  .cats a {
+    padding: 14px 18px;
+    font-size: 14px; font-weight: 500;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    transition: color .15s, border-color .15s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .cats a:hover { color: var(--ink); }
+  .cats a.active {
+    color: var(--ink); font-weight: 700;
+    border-bottom-color: var(--ink);
+  }
+  .cats a .count {
+    font-size: 11px; color: var(--ink-3);
+    padding: 1px 7px; border-radius: var(--r-full);
+    background: var(--line-2);
+    font-weight: 500;
+  }
+  .cats a.active .count { background: var(--primary-soft); color: var(--primary); }
+
+  /* ============ FEATURED HERO ============ */
+  .featured {
+    max-width: 1320px; margin: 0 auto;
+    padding: 32px 48px 32px;
+    display: grid; grid-template-columns: 2fr 1fr; gap: 20px;
+  }
+
+  /* Hero card */
+  .hero-card {
+    position: relative;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    cursor: pointer;
+    transition: transform .2s;
+  }
+  .hero-card:hover { transform: translateY(-2px); }
+  .hero-card::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 25% 35%, rgba(13,89,242,.3), transparent 55%),
+      linear-gradient(180deg, transparent 40%, rgba(0,0,0,.85));
+  }
+  .hero-card .tag-img {
+    position: absolute; top: 18px; left: 22px;
+    font-size: 11px; color: rgba(255,255,255,.5);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    z-index: 1; font-weight: 500;
+  }
+  .hero-card .topic-pill {
+    position: absolute; top: 18px; right: 22px; z-index: 1;
+    padding: 5px 12px;
+    background: var(--primary); color: white;
+    border-radius: var(--r-full);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .hero-card .body {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 32px 36px;
+    color: white; z-index: 1;
+  }
+  .hero-card .body .topic {
+    display: inline-block;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: rgba(255,255,255,.7);
+    margin-bottom: 12px;
+  }
+  .hero-card .body h2 {
+    font-size: 30px; line-height: 1.18; font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+    max-width: 720px;
+  }
+  .hero-card .body p {
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(255,255,255,.8);
+    margin: 0 0 16px;
+    max-width: 620px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .hero-card .body .meta {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,.7);
+  }
+  .hero-card .body .meta .av {
+    width: 24px; height: 24px; border-radius: 999px;
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  }
+  .hero-card .body .meta .dot { width: 3px; height: 3px; background: rgba(255,255,255,.4); border-radius: 999px; }
+
+  /* Hero secondary stack */
+  .hero-stack { display: grid; grid-template-rows: 1fr 1fr; gap: 20px; }
+  .stack-card {
+    position: relative; overflow: hidden;
+    border-radius: var(--r-lg);
+    cursor: pointer;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    transition: border-color .15s, transform .2s;
+    display: grid; grid-template-columns: 140px 1fr;
+  }
+  .stack-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .stack-card .thumb {
+    background: linear-gradient(135deg, #0d59f2, #1e3a8a);
+    position: relative;
+  }
+  .stack-card.s2 .thumb { background: linear-gradient(135deg, #334155, #0d59f2); }
+  .stack-card .thumb::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.12), transparent 60%);
+  }
+  .stack-card .body {
+    padding: 16px 18px;
+    display: flex; flex-direction: column;
+  }
+  .stack-card .topic-text {
+    font-size: 10px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stack-card h3 {
+    font-size: 15px; font-weight: 700; color: var(--ink);
+    margin: 0 0 8px; line-height: 1.35;
+    letter-spacing: -0.005em;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .stack-card .foot {
+    margin-top: auto;
+    font-size: 11px; color: var(--ink-3);
+    display: flex; gap: 10px;
+  }
+  .stack-card .foot span { display: inline-flex; align-items: center; gap: 4px; }
+  .stack-card .foot .ms { font-size: 13px; }
+
+  /* ============ MAIN GRID ============ */
+  .main-wrap {
+    max-width: 1320px; margin: 0 auto;
+    padding: 16px 48px 72px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .section-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 8px 0 20px;
+  }
+  .section-head h2 {
+    font-size: 22px; font-weight: 700; color: var(--ink); margin: 0;
+    letter-spacing: -0.015em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-head h2 .ms { color: var(--primary); }
+  .section-head .filter {
+    display: flex; gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 3px;
+  }
+  .section-head .filter a {
+    padding: 6px 12px;
+    font-size: 12px; font-weight: 500;
+    color: var(--ink-2);
+    border-radius: var(--r-sm);
+    text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .section-head .filter a:hover { color: var(--ink); }
+  .section-head .filter a.active { background: var(--ink); color: white; }
+
+  /* Mixed article list */
+  .articles-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .art-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .15s, transform .15s;
+    display: flex; flex-direction: column;
+  }
+  .art-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+  .art-card .thumb {
+    aspect-ratio: 16/9;
+    position: relative;
+  }
+  .art-card .thumb::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(13,89,242,.2), transparent 60%);
+  }
+  .art-card .thumb .topic {
+    position: absolute; top: 12px; left: 12px;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px;
+    background: rgba(255,255,255,.95); color: var(--ink);
+    border-radius: var(--r-full);
+  }
+  .art-card .body {
+    padding: 18px 20px 20px;
+    display: flex; flex-direction: column; flex: 1;
+  }
+  .art-card .topic-text {
+    font-size: 10px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .art-card h4 {
+    font-size: 17px; font-weight: 700; color: var(--ink);
+    margin: 0 0 8px; line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+  .art-card p {
+    font-size: 13px; color: var(--ink-2); line-height: 1.55;
+    margin: 0 0 16px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .art-card .foot {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: auto;
+    font-size: 11px; color: var(--ink-3);
+    padding-top: 14px;
+    border-top: 1px solid var(--line-2);
+  }
+  .art-card .foot .av {
+    width: 22px; height: 22px; border-radius: 999px;
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  }
+  .art-card .foot .name { color: var(--ink-2); font-weight: 500; }
+  .art-card .foot .dot { width: 3px; height: 3px; background: var(--ink-3); border-radius: 999px; }
+
+  /* Thumb gradients */
+  .g1 { background: linear-gradient(135deg, #1e293b, #334155); }
+  .g2 { background: linear-gradient(135deg, #0d59f2, #1e3a8a); }
+  .g3 { background: linear-gradient(135deg, #334155, #0d59f2); }
+  .g4 { background: linear-gradient(135deg, #1e3a8a, #0f172a); }
+  .g5 { background: linear-gradient(135deg, #475569, #1e293b); }
+  .g6 { background: linear-gradient(135deg, #0f172a, #1e3a8a); }
+
+  /* Horizontal list section */
+  .list-section {
+    margin-top: 56px;
+  }
+  .list-section h2 {
+    font-size: 22px; font-weight: 700; color: var(--ink); margin: 0 0 20px;
+    letter-spacing: -0.015em;
+  }
+  .list-row {
+    display: grid; gap: 14px;
+  }
+  .list-row .row {
+    display: grid; grid-template-columns: 160px 1fr;
+    gap: 18px; align-items: center;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .list-row .row:hover { border-color: var(--primary); background: var(--surface); }
+  .list-row .row .thumb {
+    aspect-ratio: 16/10;
+    border-radius: var(--r-md);
+    position: relative; overflow: hidden;
+  }
+  .list-row .row .thumb::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(13,89,242,.2), transparent 60%);
+  }
+  .list-row .row .body { display: flex; flex-direction: column; gap: 6px; }
+  .list-row .topic-text { font-size: 10px; font-weight: 700; color: var(--primary); letter-spacing: 0.1em; text-transform: uppercase; }
+  .list-row h4 { font-size: 18px; font-weight: 700; color: var(--ink); margin: 0; line-height: 1.3; letter-spacing: -0.005em; }
+  .list-row p { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .list-row .foot { display: flex; gap: 10px; align-items: center; font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+  .list-row .foot .av { width: 20px; height: 20px; border-radius: 999px; background: linear-gradient(135deg, #cbd5e1, #94a3b8); }
+  .list-row .foot .name { color: var(--ink-2); font-weight: 500; }
+  .list-row .foot .dot { width: 3px; height: 3px; background: var(--ink-3); border-radius: 999px; }
+
+  /* ============ PAGINATION ============ */
+  .pagination {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-top: 48px;
+  }
+  .pagination .page {
+    min-width: 38px; height: 38px; padding: 0 12px;
+    border-radius: var(--r-md);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    font-size: 13px; font-weight: 500;
+    color: var(--ink-2);
+    display: grid; place-items: center;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+    text-decoration: none;
+  }
+  .pagination .page:hover { background: var(--line-2); color: var(--ink); }
+  .pagination .page.active {
+    background: var(--ink); color: white; border-color: var(--ink);
+  }
+  .pagination .page.dots {
+    border: none; background: none; cursor: default;
+    color: var(--ink-3);
+  }
+  .pagination .page.nav .ms { font-size: 18px; }
+
+  /* ============ SIDEBAR ============ */
+  aside.side { display: grid; gap: 20px; }
+  .side-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .side-card .head {
+    padding: 16px 18px 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .side-card .head h4 {
+    font-size: 13px; font-weight: 700; margin: 0;
+    color: var(--ink); display: flex; align-items: center; gap: 6px;
+  }
+  .side-card .head h4 .ms { color: var(--primary); font-size: 18px; }
+  .side-card .head a {
+    font-size: 11px; color: var(--primary); font-weight: 500; text-decoration: none;
+  }
+
+  /* Trending */
+  .trend-item {
+    display: grid; grid-template-columns: 30px 1fr;
+    gap: 12px; align-items: center;
+    padding: 12px 18px;
+    border-top: 1px solid var(--line-2);
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .trend-item:hover { background: var(--line-2); }
+  .trend-item .rank {
+    font-size: 22px; font-weight: 700; color: var(--ink-3); letter-spacing: -0.02em;
+    line-height: 1; font-family: 'Roboto', monospace;
+  }
+  .trend-item.top .rank { color: var(--primary); }
+  .trend-item .info { line-height: 1.35; min-width: 0; }
+  .trend-item .info .label { font-size: 10px; font-weight: 700; color: var(--primary); letter-spacing: 0.08em; text-transform: uppercase; }
+  .trend-item .info .t {
+    font-size: 13px; font-weight: 500; color: var(--ink);
+    margin-top: 3px; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .trend-item .info .s { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+  /* Newsletter */
+  .newsletter {
+    background: var(--ink); color: white;
+    border-radius: var(--r-lg);
+    padding: 22px;
+    position: relative; overflow: hidden;
+  }
+  .newsletter::before {
+    content: ""; position: absolute;
+    right: -40px; top: -50px;
+    width: 140px; height: 140px; border-radius: 999px;
+    background: radial-gradient(circle, var(--primary), transparent 65%);
+    opacity: 0.5;
+  }
+  .newsletter .ico {
+    width: 36px; height: 36px; border-radius: var(--r-md);
+    background: rgba(13,89,242,.25); color: white;
+    display: grid; place-items: center;
+    margin-bottom: 14px; position: relative; z-index: 1;
+  }
+  .newsletter h4 { font-size: 16px; font-weight: 700; margin: 0 0 6px; position: relative; z-index: 1; }
+  .newsletter p { font-size: 12px; color: rgba(255,255,255,.7); margin: 0 0 14px; line-height: 1.5; position: relative; z-index: 1; }
+  .newsletter form { display: flex; gap: 6px; position: relative; z-index: 1; }
+  .newsletter input {
+    flex: 1; height: 38px; padding: 0 12px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.06);
+    border-radius: var(--r-md);
+    color: white; font-family: inherit; font-size: 13px; outline: none;
+  }
+  .newsletter input::placeholder { color: rgba(255,255,255,.4); }
+  .newsletter button {
+    height: 38px; padding: 0 14px;
+    background: var(--primary); color: white;
+    border: none; border-radius: var(--r-md);
+    font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+
+  /* Tags cloud */
+  .tags-card { padding: 18px; }
+  .tags-card h4 { font-size: 13px; font-weight: 700; margin: 0 0 14px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+  .tags-card h4 .ms { color: var(--primary); font-size: 18px; }
+  .tags-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags-list a {
+    padding: 6px 12px;
+    background: var(--line-2); color: var(--ink-2);
+    border-radius: var(--r-full);
+    font-size: 12px; font-weight: 500;
+    text-decoration: none; transition: background .15s, color .15s;
+  }
+  .tags-list a:hover { background: var(--primary-soft); color: var(--primary); }
+
+  /* Weekly digest */
+  .digest {
+    padding: 18px;
+    background: var(--primary-soft);
+    border-radius: var(--r-lg);
+    border: 1px solid rgba(13,89,242,.15);
+  }
+  .digest .label {
+    font-size: 10px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .digest h4 { font-size: 16px; font-weight: 700; margin: 0 0 6px; color: var(--ink); }
+  .digest p { font-size: 12px; color: var(--ink-2); margin: 0 0 12px; line-height: 1.55; }
+  .digest a {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--primary); font-size: 13px; font-weight: 700;
+    text-decoration: none;
+  }
+  .digest a:hover { text-decoration: underline; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1100px) {
+    .featured { grid-template-columns: 1fr; }
+    .hero-stack { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .main-wrap { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .nav { padding: 12px 20px; }
+    .nav-menu { display: none; }
+    .page-head { padding: 32px 20px 16px; grid-template-columns: 1fr; }
+    .page-head .search { width: 100%; }
+    .page-head h1 { font-size: 30px; }
+    .cats-wrap, .featured, .main-wrap { padding-left: 20px; padding-right: 20px; }
+    .featured { padding-top: 24px; }
+    .hero-card { aspect-ratio: 4/3; }
+    .hero-card .body { padding: 20px; }
+    .hero-card .body h2 { font-size: 22px; }
+    .hero-stack { grid-template-columns: 1fr; }
+    .stack-card { grid-template-columns: 100px 1fr; }
+    .articles-grid { grid-template-columns: 1fr; }
+    .list-row .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body data-screen-label="01 Blog Index">
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="brand">
+      <div class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
+        </svg>
+      </div>
+      <h2>CoffeeTree</h2>
+      <nav class="nav-menu">
+        <a href="Home.html">Trang chủ</a>
+        <a href="Home.html#courses">Khóa học</a>
+        <a href="Blog.html" class="active">Cẩm nang</a>
+        <a href="#">Về chúng tôi</a>
+      </nav>
+    </div>
+    <div class="nav-right">
+      <a href="Sign In.html" class="nav-link">Đăng nhập</a>
+      <a href="Sign Up.html" class="btn btn-primary btn-sm">Đăng ký miễn phí</a>
+    </div>
+  </header>
+
+  <!-- ============ PAGE HEAD ============ -->
+  <section class="page-head">
+    <div class="title-block">
+      <div class="kicker">Cẩm nang vận hành</div>
+      <h1>Bài viết &amp; góc nhìn cho chủ quán cà phê.</h1>
+      <p>Phân tích thực tế, case study, mẹo vận hành — viết bởi chủ quán đang làm thật ngoài kia. Đọc miễn phí, áp dụng được ngay.</p>
+    </div>
+    <label class="search">
+      <span class="ms">search</span>
+      <input type="text" placeholder="Tìm bài viết, chủ đề…" />
+    </label>
+  </section>
+
+  <!-- ============ CATEGORY TABS ============ -->
+  <div class="cats-wrap">
+    <nav class="cats" aria-label="Danh mục">
+      <a href="#" class="active">Tất cả <span class="count">124</span></a>
+      <a href="#">Vận hành <span class="count">38</span></a>
+      <a href="#">Tài chính <span class="count">22</span></a>
+      <a href="#">Nhân sự <span class="count">18</span></a>
+      <a href="#">Menu &amp; sản phẩm <span class="count">16</span></a>
+      <a href="#">Marketing <span class="count">14</span></a>
+      <a href="#">Case study <span class="count">9</span></a>
+      <a href="#">Khởi nghiệp <span class="count">7</span></a>
+    </nav>
+  </div>
+
+  <!-- ============ FEATURED ============ -->
+  <section class="featured">
+    <!-- Hero big -->
+    <a class="hero-card g1" href="Article.html">
+      <span class="tag-img">[ Hero image · 16:9 ]</span>
+      <span class="topic-pill">Case study</span>
+      <div class="body">
+        <div class="topic">Vận hành · 12 phút đọc</div>
+        <h2>Mở quán thứ hai sau 18 tháng: bài học từ Cà phê Sương Mai</h2>
+        <p>Khi nào nên mở chi nhánh thứ hai, làm sao để chi nhánh mới không kéo lùi chi nhánh đầu tiên, và những con số bạn cần đọc được trước khi ký mặt bằng tiếp theo.</p>
+        <div class="meta">
+          <div class="av"></div>
+          <span>Trần Minh Hoàng</span>
+          <span class="dot"></span>
+          <span>20 / 05 / 2026</span>
+          <span class="dot"></span>
+          <span>3.4k lượt xem</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Stack -->
+    <div class="hero-stack">
+      <a class="stack-card" href="#">
+        <div class="thumb"></div>
+        <div class="body">
+          <div class="topic-text">Tài chính</div>
+          <h3>Quán bạn đang lỗ ở đâu? Đọc P&amp;L trong 5 phút</h3>
+          <div class="foot">
+            <span><span class="ms">schedule</span>8 phút</span>
+            <span><span class="ms">calendar_today</span>18 / 05</span>
+          </div>
+        </div>
+      </a>
+      <a class="stack-card s2" href="#">
+        <div class="thumb"></div>
+        <div class="body">
+          <div class="topic-text">Nhân sự</div>
+          <h3>4 lý do barista nghỉ trong 90 ngày đầu — và cách khắc phục</h3>
+          <div class="foot">
+            <span><span class="ms">schedule</span>6 phút</span>
+            <span><span class="ms">calendar_today</span>14 / 05</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main-wrap">
+
+    <!-- LEFT — articles -->
+    <section>
+      <!-- Latest -->
+      <div class="section-head">
+        <h2><span class="ms">bolt</span>Bài viết mới nhất</h2>
+        <div class="filter">
+          <a href="#" class="active">Mới</a>
+          <a href="#">Phổ biến</a>
+          <a href="#">Bình luận</a>
+        </div>
+      </div>
+
+      <div class="articles-grid">
+        <article class="art-card">
+          <div class="thumb g2"><span class="topic">Marketing</span></div>
+          <div class="body">
+            <div class="topic-text">Marketing · 7 phút đọc</div>
+            <h4>Quán nhỏ, social nhỏ: lịch nội dung 7 ngày cho 1 người</h4>
+            <p>Bạn không có team. Đây là lịch 7 ngày, mỗi ngày 1 bài, ai cũng làm được — kèm template caption sẵn dùng.</p>
+            <div class="foot">
+              <div class="av"></div>
+              <span class="name">Đỗ Khánh Linh</span>
+              <span class="dot"></span>
+              <span>06 / 05</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="art-card">
+          <div class="thumb g3"><span class="topic">Menu</span></div>
+          <div class="body">
+            <div class="topic-text">Sản phẩm · 9 phút đọc</div>
+            <h4>Định lượng menu mùa hè: 12 món bán chạy theo nhiệt độ</h4>
+            <p>Khi trời nóng, hành vi gọi món đổi rất nhanh. Đây là cách 3 quán đã điều chỉnh menu trong 2 tuần.</p>
+            <div class="foot">
+              <div class="av"></div>
+              <span class="name">Lê Quang Vinh</span>
+              <span class="dot"></span>
+              <span>10 / 05</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="art-card">
+          <div class="thumb g4"><span class="topic">Vận hành</span></div>
+          <div class="body">
+            <div class="topic-text">Vận hành · 10 phút đọc</div>
+            <h4>SOP &amp; chuẩn hóa khi mở chi nhánh thứ 2</h4>
+            <p>5 nhóm SOP tối thiểu và cách viết tài liệu mà nhân viên thực sự đọc — không phải chỉ đặt cho có.</p>
+            <div class="foot">
+              <div class="av"></div>
+              <span class="name">Trần Minh Hoàng</span>
+              <span class="dot"></span>
+              <span>04 / 05</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="art-card">
+          <div class="thumb g5"><span class="topic">Khởi nghiệp</span></div>
+          <div class="body">
+            <div class="topic-text">Khởi nghiệp · 11 phút đọc</div>
+            <h4>Mở quán cà phê 200 triệu: chi tiết từng đồng đầu tư</h4>
+            <p>Bảng chi phí thực tế cho quán take-away 20m². Đầy đủ từ mặt bằng, máy, đến marketing 3 tháng đầu.</p>
+            <div class="foot">
+              <div class="av"></div>
+              <span class="name">Phạm Mai Anh</span>
+              <span class="dot"></span>
+              <span>02 / 05</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="art-card">
+          <div class="thumb g6"><span class="topic">Tài chính</span></div>
+          <div class="body">
+            <div class="topic-text">Tài chính · 7 phút đọc</div>
+            <h4>Dòng tiền âm 3 tháng liên tiếp: cứu hay đóng?</h4>
+            <p>Một framework 4 câu hỏi giúp bạn quyết định khi quán liên tục lỗ — trước khi đốt thêm vốn.</p>
+            <div class="foot">
+              <div class="av"></div>
+              <span class="name">Phạm Thu Hương</span>
+              <span class="dot"></span>
+              <span>28 / 04</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="art-card">
+          <div class="thumb g1"><span class="topic">Nhân sự</span></div>
+          <div class="body">
+            <div class="topic-text">Nhân sự · 8 phút đọc</div>
+            <h4>Mức lương barista 2026: dữ liệu từ 180 quán Việt Nam</h4>
+            <p>Tổng hợp lương cứng, phần thưởng theo doanh thu, chế độ làm thêm — 3 vùng TP. HCM, Hà Nội, Đà Nẵng.</p>
+            <div class="foot">
+              <div class="av"></div>
+              <span class="name">Nguyễn Anh Tuấn</span>
+              <span class="dot"></span>
+              <span>22 / 04</span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Long-read section -->
+      <section class="list-section">
+        <h2>Bài đọc dài cuối tuần</h2>
+        <div class="list-row">
+          <a class="row" href="#">
+            <div class="thumb g3"></div>
+            <div class="body">
+              <div class="topic-text">Phân tích · 14 phút đọc</div>
+              <h4>Specialty coffee tại Việt Nam: thị trường thật sự lớn cỡ nào?</h4>
+              <p>Phân tích 5 năm dữ liệu nhập khẩu &amp; tiêu thụ, kết hợp khảo sát 320 quán độc lập tại 6 thành phố.</p>
+              <div class="foot">
+                <div class="av"></div>
+                <span class="name">Trần Minh Hoàng</span>
+                <span class="dot"></span>
+                <span>30 / 04</span>
+                <span class="dot"></span>
+                <span>5.8k lượt xem</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="row" href="#">
+            <div class="thumb g4"></div>
+            <div class="body">
+              <div class="topic-text">Case study · 13 phút đọc</div>
+              <h4>The Slow Bar Đà Nẵng: từ một quán 8m² đến 3 chi nhánh trong 26 tháng</h4>
+              <p>Hành trình của Lê Quang Vinh — quyết định khó nhất, sai lầm tốn nhất, và bài học cô đọng trong 1 trang.</p>
+              <div class="foot">
+                <div class="av"></div>
+                <span class="name">Lê Quang Vinh</span>
+                <span class="dot"></span>
+                <span>26 / 04</span>
+                <span class="dot"></span>
+                <span>4.2k lượt xem</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="row" href="#">
+            <div class="thumb g6"></div>
+            <div class="body">
+              <div class="topic-text">Vận hành · 16 phút đọc</div>
+              <h4>1 năm đầu của quán: 12 thứ tôi đã làm sai, và những gì sẽ làm khác</h4>
+              <p>Hà — founder Cà phê Sương Mai — chia sẻ thẳng thắn về 12 sai lầm trong năm đầu mở quán đầu tiên.</p>
+              <div class="foot">
+                <div class="av"></div>
+                <span class="name">Cà phê Sương Mai</span>
+                <span class="dot"></span>
+                <span>18 / 04</span>
+                <span class="dot"></span>
+                <span>7.1k lượt xem</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Pagination -->
+      <nav class="pagination" aria-label="Phân trang">
+        <a href="#" class="page nav"><span class="ms">chevron_left</span></a>
+        <a href="#" class="page active">1</a>
+        <a href="#" class="page">2</a>
+        <a href="#" class="page">3</a>
+        <span class="page dots">…</span>
+        <a href="#" class="page">14</a>
+        <a href="#" class="page nav"><span class="ms">chevron_right</span></a>
+      </nav>
+    </section>
+
+    <!-- RIGHT — sidebar -->
+    <aside class="side">
+      <!-- Trending -->
+      <div class="side-card">
+        <div class="head">
+          <h4><span class="ms">trending_up</span>Trending tuần này</h4>
+          <a href="#">Xem hết</a>
+        </div>
+        <div class="trend-item top">
+          <div class="rank">01</div>
+          <div class="info">
+            <div class="label">Vận hành</div>
+            <div class="t">Mở quán thứ hai sau 18 tháng: bài học từ Cà phê Sương Mai</div>
+            <div class="s">3.4k lượt xem · 12 phút</div>
+          </div>
+        </div>
+        <div class="trend-item top">
+          <div class="rank">02</div>
+          <div class="info">
+            <div class="label">Tài chính</div>
+            <div class="t">Quán bạn đang lỗ ở đâu? Đọc P&amp;L trong 5 phút</div>
+            <div class="s">5.2k lượt xem · 8 phút</div>
+          </div>
+        </div>
+        <div class="trend-item top">
+          <div class="rank">03</div>
+          <div class="info">
+            <div class="label">Nhân sự</div>
+            <div class="t">4 lý do barista nghỉ trong 90 ngày đầu</div>
+            <div class="s">3.8k lượt xem · 6 phút</div>
+          </div>
+        </div>
+        <div class="trend-item">
+          <div class="rank">04</div>
+          <div class="info">
+            <div class="label">Menu</div>
+            <div class="t">Định lượng menu mùa hè: 12 món theo nhiệt độ</div>
+            <div class="s">2.6k lượt xem · 9 phút</div>
+          </div>
+        </div>
+        <div class="trend-item">
+          <div class="rank">05</div>
+          <div class="info">
+            <div class="label">Khởi nghiệp</div>
+            <div class="t">Mở quán 200 triệu: chi tiết từng đồng đầu tư</div>
+            <div class="s">2.1k lượt xem · 11 phút</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="newsletter">
+        <div class="ico"><span class="ms">mail</span></div>
+        <h4>Tin tức tuần</h4>
+        <p>1 bài viết, 1 mẹo vận hành mỗi tuần. Không spam, không bán hàng. 4.2k chủ quán đang đăng ký.</p>
+        <form onsubmit="event.preventDefault();">
+          <input type="email" placeholder="ban@email.com" />
+          <button type="submit">Đăng ký</button>
+        </form>
+      </div>
+
+      <!-- Weekly digest -->
+      <div class="digest">
+        <div class="label">Tuần này</div>
+        <h4>Digest #24 đã ra mắt.</h4>
+        <p>5 bài chọn lọc về tài chính quán + 1 worksheet P&amp;L mới — đọc trong 25 phút cuối tuần.</p>
+        <a href="#">Đọc digest<span class="ms sm">arrow_forward</span></a>
+      </div>
+
+      <!-- Tags cloud -->
+      <div class="side-card tags-card">
+        <h4><span class="ms">tag</span>Chủ đề phổ biến</h4>
+        <div class="tags-list">
+          <a href="#">#vận-hành</a>
+          <a href="#">#tài-chính</a>
+          <a href="#">#barista</a>
+          <a href="#">#mở-quán</a>
+          <a href="#">#sop</a>
+          <a href="#">#menu</a>
+          <a href="#">#marketing</a>
+          <a href="#">#case-study</a>
+          <a href="#">#nhân-sự</a>
+          <a href="#">#mặt-bằng</a>
+          <a href="#">#thương-hiệu</a>
+          <a href="#">#chuỗi</a>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+</body>
+</html>
