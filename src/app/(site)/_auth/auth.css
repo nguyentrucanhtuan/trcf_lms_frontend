@@ -1,0 +1,79 @@
+/* Student auth pages (sign in / sign up) — ported from Sign Up.html. Scoped `.ct`. */
+
+.ct .auth { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+/* LEFT — brand panel */
+.ct .auth-left { background: var(--ink); color: white; padding: 40px 56px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.ct .auth-left::before { content: ""; position: absolute; right: -120px; top: -160px; width: 380px; height: 380px; border-radius: 999px; background: radial-gradient(circle, var(--primary), transparent 65%); opacity: 0.5; }
+.ct .auth-left::after { content: ""; position: absolute; left: -100px; bottom: -180px; width: 320px; height: 320px; border-radius: 999px; background: radial-gradient(circle, rgba(13,89,242,.5), transparent 65%); opacity: 0.35; }
+.ct .auth-brand { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; text-decoration: none; color: white; }
+.ct .auth-brand .logo-mark { color: white; }
+.ct .auth-brand h2 { margin: 0; font-size: 16px; font-weight: 700; }
+.ct .auth-left-content { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 480px; position: relative; z-index: 1; }
+.ct .auth-left-content .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: rgba(255,255,255,.7); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 18px; }
+.ct .auth-left-content .kicker .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--primary); }
+.ct .auth-left-content h1 { font-size: 40px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 18px; text-wrap: balance; }
+.ct .auth-left-content > p { font-size: 15px; line-height: 1.65; color: rgba(255,255,255,.7); margin: 0 0 32px; }
+
+.ct .auth-steps { display: grid; gap: 0; margin-top: 8px; position: relative; }
+.ct .auth-steps::before { content: ""; position: absolute; left: 14px; top: 14px; bottom: 14px; width: 2px; background: rgba(255,255,255,.12); }
+.ct .auth-step { display: grid; grid-template-columns: 28px 1fr; gap: 14px; align-items: flex-start; padding: 14px 0; position: relative; }
+.ct .auth-step .num { width: 28px; height: 28px; border-radius: 999px; background: rgba(13,89,242,.25); color: white; border: 2px solid var(--ink); display: grid; place-items: center; font-size: 12px; font-weight: 700; position: relative; z-index: 1; }
+.ct .auth-step.active .num { background: var(--primary); box-shadow: 0 0 0 4px rgba(13,89,242,.25); }
+.ct .auth-step .txt { line-height: 1.4; padding-top: 4px; }
+.ct .auth-step .txt .t { font-size: 14px; font-weight: 700; color: white; }
+.ct .auth-step .txt .s { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 2px; }
+
+/* RIGHT — form panel */
+.ct .auth-right { background: var(--surface); display: flex; flex-direction: column; padding: 32px 56px 40px; overflow-y: auto; min-height: 100vh; }
+.ct .auth-right-top { display: flex; justify-content: flex-end; font-size: 13px; color: var(--ink-2); }
+.ct .auth-right-top a { color: var(--primary); font-weight: 700; text-decoration: none; margin-left: 6px; }
+.ct .auth-right-top a:hover { text-decoration: underline; }
+.ct .auth-form-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 460px; width: 100%; margin: 0 auto; padding: 24px 0; }
+.ct .auth-form-wrap h2 { font-size: 30px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 0 0 8px; }
+.ct .auth-form-wrap .lead { font-size: 14.5px; color: var(--ink-2); line-height: 1.6; margin: 0 0 28px; }
+
+.ct .form-group { display: grid; gap: 6px; margin-bottom: 14px; }
+.ct .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ct .form-group label { font-size: 13px; font-weight: 500; color: var(--ink); }
+.ct .input-wrap { position: relative; }
+.ct .input-wrap > .ms { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 18px; pointer-events: none; }
+.ct .input-wrap .field { padding-left: 42px; }
+.ct .field { width: 100%; height: 46px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); font-family: inherit; font-size: 14px; color: var(--ink); transition: border-color .15s, box-shadow .15s; }
+.ct .field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,89,242,.15); }
+.ct .input-wrap .toggle-pw { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: var(--r-md); display: grid; place-items: center; color: var(--ink-3); background: none; border: none; cursor: pointer; }
+.ct .input-wrap .toggle-pw:hover { background: var(--line-2); color: var(--ink); }
+.ct .field-error { font-size: 12px; color: #ef4444; }
+
+.ct .pw-hint { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+.ct .pw-hint strong { color: var(--ink-2); font-weight: 500; }
+
+.ct .checkbox-row { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0 22px; font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.ct .checkbox { display: inline-flex; align-items: flex-start; gap: 8px; cursor: pointer; user-select: none; }
+.ct .checkbox input { position: absolute; opacity: 0; pointer-events: none; }
+.ct .checkbox .box { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--surface); display: grid; place-items: center; transition: background .15s, border-color .15s; margin-top: 1px; flex-shrink: 0; }
+.ct .checkbox .box .ms { font-size: 14px; color: white; opacity: 0; }
+.ct .checkbox input:checked + .box { background: var(--primary); border-color: var(--primary); }
+.ct .checkbox input:checked + .box .ms { opacity: 1; }
+.ct .checkbox span:last-child { color: var(--ink-2); }
+.ct .checkbox a { color: var(--primary); text-decoration: none; font-weight: 500; }
+
+.ct .btn-submit { width: 100%; height: 48px; background: var(--primary); color: white; border-radius: var(--r-md); font-weight: 700; font-size: 14px; box-shadow: var(--shadow-cta); transition: background .15s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; }
+.ct .btn-submit:hover { background: var(--primary-hover); }
+.ct .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+.ct .auth-note { margin-top: 18px; padding: 12px 14px; background: var(--line-2); border-radius: var(--r-md); font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
+.ct .auth-note a { color: var(--primary); font-weight: 500; text-decoration: none; }
+
+.ct .auth-foot { text-align: center; font-size: 12px; color: var(--ink-3); padding: 18px 0 0; }
+.ct .auth-foot a { color: var(--ink-2); text-decoration: none; margin: 0 8px; }
+.ct .auth-foot a:hover { color: var(--ink); }
+
+@media (max-width: 960px) {
+  .ct .auth { grid-template-columns: 1fr; min-height: auto; }
+  .ct .auth-left { display: none; }
+  .ct .auth-right { padding: 32px 24px; }
+}
+@media (max-width: 480px) {
+  .ct .form-row-2 { grid-template-columns: 1fr; }
+}

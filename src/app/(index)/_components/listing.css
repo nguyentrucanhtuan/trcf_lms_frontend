@@ -1,0 +1,48 @@
+/* Shared listing chrome (page head, category tabs, pagination).
+   Scoped under `.ct`; used by the course catalog and the blog index. */
+
+/* ============ PAGE HEAD ============ */
+.ct .page-head {
+  max-width: 1320px; margin: 0 auto;
+  padding: 40px 48px 24px;
+  display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: end;
+}
+.ct .page-head .title-block .kicker { font-size: 12px; font-weight: 700; color: var(--primary); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+.ct .page-head h1 { font-size: 40px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 0 0 12px; text-wrap: balance; }
+.ct .page-head p { font-size: 15px; line-height: 1.6; color: var(--ink-2); margin: 0; max-width: 600px; }
+.ct .page-head .search { display: flex; align-items: center; gap: 10px; width: 320px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); transition: border-color .15s, box-shadow .15s; }
+.ct .page-head .search:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,89,242,.12); }
+.ct .page-head .search .ms { color: var(--ink-3); font-size: 18px; }
+.ct .page-head .search input { flex: 1; border: none; background: none; outline: none; font-family: inherit; font-size: 13.5px; color: var(--ink); }
+.ct .page-head .search input::placeholder { color: var(--ink-3); }
+
+/* ============ CATEGORY TABS ============ */
+.ct .cats-wrap { max-width: 1320px; margin: 0 auto; padding: 0 48px; }
+.ct .cats { display: flex; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ct .cats::-webkit-scrollbar { display: none; }
+.ct .cats a {
+  padding: 14px 18px; font-size: 14px; font-weight: 500;
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  white-space: nowrap; transition: color .15s, border-color .15s;
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+}
+.ct .cats a:hover { color: var(--ink); text-decoration: none; }
+.ct .cats a.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
+.ct .cats a .count { font-size: 11px; color: var(--ink-3); padding: 1px 7px; border-radius: var(--r-full); background: var(--line-2); font-weight: 500; }
+.ct .cats a.active .count { background: var(--primary-soft); color: var(--primary); }
+
+/* ============ PAGINATION ============ */
+.ct .pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 48px; }
+.ct .pagination .page { min-width: 38px; height: 38px; padding: 0 12px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); font-size: 13px; font-weight: 500; color: var(--ink-2); display: grid; place-items: center; cursor: pointer; transition: background .15s, color .15s, border-color .15s; text-decoration: none; }
+.ct .pagination .page:hover { background: var(--line-2); color: var(--ink); text-decoration: none; }
+.ct .pagination .page.active { background: var(--ink); color: white; border-color: var(--ink); }
+.ct .pagination .page.disabled { opacity: 0.4; pointer-events: none; }
+.ct .pagination .page.nav .ms { font-size: 18px; }
+
+@media (max-width: 720px) {
+  .ct .page-head { padding: 32px 20px 16px; grid-template-columns: 1fr; }
+  .ct .page-head .search { width: 100%; }
+  .ct .page-head h1 { font-size: 30px; }
+  .ct .cats-wrap { padding-left: 20px; padding-right: 20px; }
+}

@@ -1,0 +1,90 @@
+/* Learning player — ported from reference-lms-coffeetree.html. Scoped `.ct`. */
+
+.ct .lp-topbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 12px 28px; background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+.ct .lp-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ct .lp-back { width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center; color: var(--ink-2); transition: background .15s; flex-shrink: 0; }
+.ct .lp-back:hover { background: var(--line-2); color: var(--ink); }
+.ct .lp-brand h2 { font-size: 15px; font-weight: 700; margin: 0; color: var(--ink); letter-spacing: -0.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; }
+
+.ct .lp-progress { display: flex; flex-direction: column; gap: 6px; width: 380px; }
+.ct .lp-progress .row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 500; color: var(--ink-2); letter-spacing: 0.08em; text-transform: uppercase; }
+.ct .lp-progress .bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.ct .lp-progress .bar > div { height: 100%; background: var(--primary); border-radius: 999px; transition: width .3s; }
+
+.ct .lp-nav-right { display: flex; align-items: center; gap: 16px; }
+.ct .lp-avatar { width: 40px; height: 40px; border-radius: 999px; background: linear-gradient(135deg, #cbd5e1, #94a3b8); box-shadow: 0 0 0 2px rgba(13,89,242,.2); }
+
+.ct .lp-main { display: grid; grid-template-columns: 1fr 400px; height: calc(100vh - 65px); overflow: hidden; }
+
+/* Stage */
+.ct .lp-stage { overflow-y: auto; background: var(--surface); }
+.ct .lp-stage-inner { max-width: 1000px; margin: 0 auto; padding: 32px; }
+.ct .lp-player { position: relative; background: #0f172a; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; box-shadow: 0 20px 40px -20px rgba(15,23,42,.3), 0 8px 16px -8px rgba(15,23,42,.15); display: grid; place-items: center; }
+.ct .lp-player video { width: 100%; height: 100%; }
+.ct .lp-player iframe { width: 100%; height: 100%; border: 0; }
+.ct .lp-player-empty { display: grid; place-items: center; gap: 14px; color: rgba(255,255,255,.7); text-align: center; padding: 24px; }
+.ct .lp-player-empty .play-btn { width: 72px; height: 72px; border-radius: 999px; background: var(--primary); color: white; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.ct .lp-player-empty .play-btn .ms { font-size: 36px; margin-left: 3px; }
+.ct .lp-player-empty .hint { font-size: 13px; }
+
+/* Locked overlay */
+.ct .lp-locked { position: absolute; inset: 0; background: rgba(15,23,42,.92); display: grid; place-items: center; text-align: center; color: white; padding: 24px; }
+.ct .lp-locked .ms { font-size: 40px; color: var(--ink-3); margin-bottom: 12px; }
+.ct .lp-locked h3 { font-size: 18px; font-weight: 700; margin: 0 0 8px; }
+.ct .lp-locked p { font-size: 13px; color: rgba(255,255,255,.7); margin: 0 0 18px; max-width: 320px; }
+
+/* Lesson head */
+.ct .lp-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin: 32px 0 24px; padding-bottom: 24px; border-bottom: 1px solid var(--line-2); }
+.ct .lp-head h1 { font-size: 26px; font-weight: 700; margin: 0 0 10px; color: var(--ink); letter-spacing: -0.015em; line-height: 1.25; }
+.ct .lp-meta { display: flex; gap: 16px; color: var(--ink-2); font-size: 13px; flex-wrap: wrap; }
+.ct .lp-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.ct .lp-meta .ms { font-size: 16px; }
+.ct .lp-actions { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* Content */
+.ct .lp-desc { color: var(--ink-2); font-size: 15px; line-height: 1.7; margin: 0 0 28px; }
+.ct .lp-desc p { margin: 0 0 16px; }
+.ct .lp-desc h2 { font-size: 20px; color: var(--ink); margin: 24px 0 12px; }
+.ct .lp-desc ul { padding-left: 20px; margin: 0 0 16px; }
+.ct .lp-empty-note { color: var(--ink-3); font-size: 14px; }
+
+/* TOC */
+.ct .lp-toc { background: var(--bg); border-left: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
+.ct .lp-toc-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.ct .lp-toc-head h3 { margin: 0; font-size: 17px; font-weight: 700; color: var(--ink); }
+.ct .lp-toc-head .tally { font-size: 11px; font-weight: 500; color: var(--ink-2); background: var(--line); padding: 4px 10px; border-radius: 6px; }
+.ct .lp-toc-list { flex: 1; overflow-y: auto; }
+.ct .lp-toc-list::-webkit-scrollbar { width: 6px; }
+.ct .lp-toc-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+
+.ct .lp-mod-head { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: var(--line-2); text-align: left; transition: background .15s; }
+.ct .lp-mod-head:hover { background: var(--line); }
+.ct .lp-mod-head .info { display: flex; flex-direction: column; gap: 2px; }
+.ct .lp-mod-head .info .lbl { font-size: 10px; font-weight: 700; color: var(--primary); letter-spacing: 0.08em; text-transform: uppercase; }
+.ct .lp-mod-head .info .ttl { font-size: 14px; font-weight: 700; color: var(--ink); }
+.ct .lp-mod-head .ms { color: var(--ink-3); }
+
+.ct .lp-lesson { display: flex; align-items: center; gap: 14px; padding: 14px 22px; border-bottom: 1px solid var(--line-2); cursor: pointer; transition: background .15s; background: var(--surface); width: 100%; text-align: left; }
+.ct .lp-lesson:hover { background: var(--line-2); }
+.ct .lp-lesson.active { background: var(--primary-soft); border-left: 4px solid var(--primary); padding-left: 18px; }
+.ct .lp-lesson .ico { width: 32px; height: 32px; border-radius: 999px; display: grid; place-items: center; flex-shrink: 0; background: var(--line-2); color: var(--ink-3); }
+.ct .lp-lesson .ico .ms { font-size: 18px; }
+.ct .lp-lesson.done .ico { background: var(--done-soft); color: var(--done); }
+.ct .lp-lesson.active .ico { background: var(--primary); color: white; }
+.ct .lp-lesson .text { min-width: 0; flex: 1; line-height: 1.35; }
+.ct .lp-lesson .text .t { font-size: 13.5px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ct .lp-lesson .text .s { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.ct .lp-lesson.active .text .t { color: var(--primary); font-weight: 700; }
+.ct .lp-lesson.locked { opacity: 0.6; }
+.ct .lp-lesson.locked .text .t { color: var(--ink-2); }
+
+@media (max-width: 1100px) {
+  .ct .lp-main { grid-template-columns: 1fr 340px; }
+  .ct .lp-progress { width: 220px; }
+}
+@media (max-width: 900px) {
+  .ct .lp-main { grid-template-columns: 1fr; height: auto; overflow: visible; }
+  .ct .lp-toc { border-left: none; border-top: 1px solid var(--line); max-height: 70vh; }
+  .ct .lp-progress { display: none; }
+  .ct .lp-head { flex-direction: column; }
+}

@@ -1,13 +1,19 @@
 "use client"
 
 import {
+  Award,
+  BadgePercent,
   BookOpen,
   CreditCard,
+  FolderTree,
   GraduationCap,
   LayoutDashboard,
   LogOut,
   ListOrdered,
+  Newspaper,
   PlaySquare,
+  Receipt,
+  Star,
   Tags,
   Ticket,
   Users as UsersIcon,
@@ -48,6 +54,16 @@ const NAV = [
     label: "Phương thức thanh toán",
     icon: CreditCard,
   },
+  { href: "/archives", label: "Bài viết", icon: Newspaper },
+  {
+    href: "/archive-categories",
+    label: "Danh mục nội dung",
+    icon: FolderTree,
+  },
+  { href: "/orders", label: "Đơn hàng", icon: Receipt },
+  { href: "/coupons", label: "Mã giảm giá", icon: BadgePercent },
+  { href: "/reviews", label: "Đánh giá", icon: Star },
+  { href: "/certificates", label: "Chứng chỉ", icon: Award },
 ]
 
 export function AppSidebar() {

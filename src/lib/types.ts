@@ -293,3 +293,178 @@ export interface LoginResponse {
   expires_in: number
   user: User
 }
+
+// ---- Archive categories (Danh mục nội dung) ----
+export interface ArchiveCategory {
+  id: number
+  name: string
+  slug: string
+  description: string | null
+  display_order: number
+  is_active: boolean
+  thumbnail_url: string | null
+  created_at: string
+  updated_at: string
+}
+export interface ArchiveCategoryCreate {
+  name: string
+  slug?: string | null
+  description?: string | null
+  display_order: number
+  is_active: boolean
+  thumbnail_url?: string | null
+}
+export interface ArchiveCategoryUpdate {
+  name?: string
+  slug?: string | null
+  description?: string | null
+  display_order?: number
+  is_active?: boolean
+  thumbnail_url?: string | null
+}
+
+// ---- Archives (Bài viết / Blog) ----
+export type ArchiveStatus = "draft" | "published" | "archived"
+
+export interface Archive {
+  id: number
+  title: string
+  slug: string
+  excerpt: string | null
+  content: string | null
+  thumbnail_url: string | null
+  status: ArchiveStatus
+  published_at: string | null
+  author_id: number
+  archive_category_id: number | null
+  view_count: number
+  created_at: string
+  updated_at: string
+}
+export interface ArchiveCreate {
+  title: string
+  slug?: string | null
+  excerpt?: string | null
+  content?: string | null
+  thumbnail_url?: string | null
+  status: ArchiveStatus
+  published_at?: string | null
+  author_id: number
+  archive_category_id?: number | null
+}
+export interface ArchiveUpdate {
+  title?: string
+  slug?: string | null
+  excerpt?: string | null
+  content?: string | null
+  thumbnail_url?: string | null
+  status?: ArchiveStatus
+  published_at?: string | null
+  archive_category_id?: number | null
+}
+
+// ---- Coupons (Mã giảm giá) ----
+export type CouponType = "percent" | "fixed"
+
+export interface Coupon {
+  id: number
+  code: string
+  description: string | null
+  discount_type: CouponType
+  discount_value: number
+  valid_from: string | null
+  valid_to: string | null
+  max_uses: number | null
+  is_active: boolean
+  used_count: number
+  created_at: string
+  updated_at: string
+}
+export interface CouponCreate {
+  code: string
+  description?: string | null
+  discount_type: CouponType
+  discount_value: number
+  valid_from?: string | null
+  valid_to?: string | null
+  max_uses?: number | null
+  is_active: boolean
+}
+export interface CouponUpdate {
+  code?: string
+  description?: string | null
+  discount_type?: CouponType
+  discount_value?: number
+  valid_from?: string | null
+  valid_to?: string | null
+  max_uses?: number | null
+  is_active?: boolean
+}
+export interface CouponValidateResult {
+  code: string
+  discount_type: CouponType
+  discount_value: number
+  discount_amount: number
+}
+
+// ---- Reviews (Đánh giá) ----
+export interface Review {
+  id: number
+  student_id: number
+  course_id: number
+  rating: number
+  title: string | null
+  comment: string | null
+  is_published: boolean
+  created_at: string
+  updated_at: string
+}
+export interface ReviewUpdate {
+  rating?: number
+  title?: string | null
+  comment?: string | null
+  is_published?: boolean
+}
+
+// ---- Certificates (Chứng chỉ) ----
+export interface Certificate {
+  id: number
+  certificate_code: string
+  student_id: number
+  course_id: number
+  notes: string | null
+  issued_at: string
+  created_at: string
+  updated_at: string
+}
+export interface CertificateCreate {
+  student_id: number
+  course_id: number
+  notes?: string | null
+}
+
+// ---- Orders (Đơn hàng) ----
+export interface OrderItem {
+  id: number
+  order_id: number
+  course_id: number
+  unit_price: number
+}
+export interface Order {
+  id: number
+  order_code: string
+  student_id: number
+  payment_method_id: number
+  payment_status: PaymentStatus
+  subtotal_amount: number
+  discount_amount: number
+  total_amount: number
+  coupon_id: number | null
+  provider_txn_id: string | null
+  provider_payload: Record<string, unknown> | null
+  paid_at: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+  items: OrderItem[]
+}

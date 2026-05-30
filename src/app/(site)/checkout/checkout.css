@@ -1,0 +1,116 @@
+/* Checkout — ported from Checkout.html. Scoped `.ct`. */
+
+.ct .co-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 32px; background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+.ct .co-topbar .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.ct .co-topbar .brand h2 { font-size: 16px; font-weight: 700; margin: 0; }
+.ct .secure-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); padding: 6px 12px; background: var(--line-2); border-radius: var(--r-full); }
+.ct .secure-tag .ms { font-size: 14px; color: var(--done); }
+.ct .help-link { color: var(--primary); font-size: 13px; font-weight: 500; text-decoration: none; margin-left: 8px; }
+
+/* Stepper */
+.ct .stepper { max-width: 1100px; margin: 0 auto; padding: 32px 32px 8px; display: flex; align-items: center; gap: 12px; }
+.ct .step { display: flex; align-items: center; gap: 10px; }
+.ct .step .num { width: 28px; height: 28px; border-radius: 999px; background: var(--line); color: var(--ink-3); display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+.ct .step.done .num { background: var(--done); color: white; }
+.ct .step.active .num { background: var(--primary); color: white; box-shadow: 0 0 0 4px rgba(13,89,242,.18); }
+.ct .step .lbl { font-size: 13px; color: var(--ink-3); font-weight: 500; }
+.ct .step.done .lbl, .ct .step.active .lbl { color: var(--ink); font-weight: 700; }
+.ct .step-divider { flex: 1; height: 2px; background: var(--line); border-radius: 2px; max-width: 80px; }
+.ct .step-divider.done { background: var(--done); }
+
+/* Page */
+.ct .co-page { max-width: 1100px; margin: 0 auto; padding: 24px 32px 64px; display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+.ct .co-page h1 { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; margin: 0 0 8px; }
+.ct .co-page .lead { font-size: 14px; color: var(--ink-2); margin: 0 0 32px; }
+
+.ct .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; margin-bottom: 20px; }
+.ct .panel-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.ct .panel-head .num { width: 26px; height: 26px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.ct .panel-head h3 { font-size: 16px; font-weight: 700; margin: 0; color: var(--ink); }
+
+.ct .form-row { display: grid; gap: 14px; margin-bottom: 12px; }
+.ct .form-row.two { grid-template-columns: 1fr 1fr; }
+.ct .co-page .form-group { display: grid; gap: 6px; }
+.ct .co-page .form-group label { font-size: 13px; font-weight: 500; color: var(--ink); }
+.ct .co-page .input-wrap { position: relative; }
+.ct .co-page .input-wrap > .ms { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 18px; pointer-events: none; }
+.ct .co-page .input-wrap .field { padding-left: 42px; }
+.ct .co-page .field { width: 100%; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); font-family: inherit; font-size: 14px; color: var(--ink); transition: border-color .15s, box-shadow .15s; }
+.ct .co-page .field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13,89,242,.15); }
+
+/* Payment methods */
+.ct .pay-methods { display: grid; gap: 10px; }
+.ct .pay-option { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1.5px solid var(--line); border-radius: var(--r-md); cursor: pointer; transition: border-color .15s, background .15s; text-align: left; background: var(--surface); width: 100%; }
+.ct .pay-option:hover { border-color: var(--ink-3); }
+.ct .pay-option .radio { width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid var(--line); display: grid; place-items: center; flex-shrink: 0; }
+.ct .pay-option .radio::after { content: ""; width: 8px; height: 8px; border-radius: 999px; background: var(--primary); opacity: 0; transition: opacity .15s; }
+.ct .pay-option.selected { border-color: var(--primary); background: rgba(13,89,242,0.025); }
+.ct .pay-option.selected .radio { border-color: var(--primary); }
+.ct .pay-option.selected .radio::after { opacity: 1; }
+.ct .pay-option .logo { width: 48px; height: 32px; border-radius: var(--r-sm); background: var(--line-2); display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.04em; flex-shrink: 0; }
+.ct .pay-option .logo.vnpay { background: #004899; color: white; }
+.ct .pay-option .logo.momo { background: #ae2070; color: white; }
+.ct .pay-option .logo.zalo { background: #0068ff; color: white; }
+.ct .pay-option .logo.bank { background: var(--done); color: white; }
+.ct .pay-option .info { flex: 1; }
+.ct .pay-option .info .t { font-size: 14px; font-weight: 500; color: var(--ink); }
+.ct .pay-option .info .s { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.ct .pay-option .extra { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+
+.ct .pay-extras { margin-top: 14px; padding: 16px; background: var(--line-2); border-radius: var(--r-md); font-size: 13px; line-height: 1.55; color: var(--ink-2); }
+
+.ct .checkbox { display: inline-flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--ink-2); cursor: pointer; user-select: none; line-height: 1.5; }
+.ct .checkbox input { position: absolute; opacity: 0; pointer-events: none; }
+.ct .checkbox .box { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--surface); display: grid; place-items: center; transition: background .15s, border-color .15s; margin-top: 1px; flex-shrink: 0; }
+.ct .checkbox .box .ms { font-size: 14px; color: white; opacity: 0; }
+.ct .checkbox input:checked + .box { background: var(--primary); border-color: var(--primary); }
+.ct .checkbox input:checked + .box .ms { opacity: 1; }
+.ct .checkbox a { color: var(--primary); font-weight: 500; text-decoration: none; }
+
+/* Order summary */
+.ct .co-page aside { position: sticky; top: 90px; }
+.ct .order-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.ct .order-head { padding: 20px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.ct .order-head h3 { font-size: 16px; font-weight: 700; margin: 0; }
+.ct .order-head .edit { font-size: 12px; color: var(--primary); text-decoration: none; font-weight: 500; }
+.ct .order-item { padding: 18px 20px; display: grid; grid-template-columns: 72px 1fr; gap: 14px; border-bottom: 1px solid var(--line); }
+.ct .order-item .thumb { aspect-ratio: 1/1; border-radius: var(--r-md); background: linear-gradient(135deg, #1e293b, #334155); position: relative; overflow: hidden; }
+.ct .order-item .thumb::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 30% 30%, rgba(13,89,242,.25), transparent 65%); }
+.ct .order-item .info .label { font-size: 11px; font-weight: 700; color: var(--primary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+.ct .order-item .info .t { font-size: 14px; font-weight: 700; color: var(--ink); line-height: 1.35; }
+.ct .order-item .info .s { font-size: 12px; color: var(--ink-3); margin-top: 6px; display: flex; gap: 10px; flex-wrap: wrap; }
+.ct .order-item .info .s span { display: inline-flex; align-items: center; gap: 4px; }
+.ct .order-item .info .s .ms { font-size: 13px; }
+
+.ct .coupon { padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.ct .coupon .row { display: flex; gap: 8px; }
+.ct .coupon .field { flex: 1; height: 40px; font-size: 13px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); color: var(--ink); outline: none; }
+.ct .coupon .field:focus { border-color: var(--primary); }
+.ct .coupon .btn { height: 40px; padding: 0 14px; font-size: 12px; flex-shrink: 0; }
+
+.ct .totals { padding: 18px 20px; }
+.ct .totals .line { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; color: var(--ink-2); }
+.ct .totals .line.discount { color: var(--done); }
+.ct .totals .total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
+.ct .totals .total .lbl { font-size: 14px; color: var(--ink); font-weight: 700; }
+.ct .totals .total .amt { font-size: 26px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+.ct .totals .total .amt .ccy { font-size: 13px; color: var(--ink-3); font-weight: 500; margin-left: 2px; }
+.ct .savings { margin-top: 8px; font-size: 12px; color: var(--ink-3); text-align: right; }
+.ct .savings strong { color: var(--done); font-weight: 700; }
+
+.ct .order-foot { padding: 16px 20px 20px; border-top: 1px solid var(--line); }
+.ct .order-foot .btn-pay { width: 100%; height: 50px; background: var(--primary); color: white; border-radius: var(--r-md); font-weight: 700; font-size: 14px; box-shadow: var(--shadow-cta); cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s; }
+.ct .order-foot .btn-pay:hover { background: var(--primary-hover); }
+.ct .order-foot .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.ct .trust-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.ct .trust { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--ink-3); line-height: 1.4; }
+.ct .trust .ms { font-size: 16px; color: var(--done); flex-shrink: 0; }
+.ct .legal { margin-top: 14px; font-size: 11px; line-height: 1.5; color: var(--ink-3); text-align: center; }
+.ct .legal a { color: var(--ink-2); text-decoration: none; }
+
+@media (max-width: 960px) {
+  .ct .co-page { grid-template-columns: 1fr; padding: 20px; }
+  .ct .co-page aside { position: static; }
+  .ct .stepper { padding: 24px 20px 0; flex-wrap: wrap; }
+  .ct .step-divider { display: none; }
+}
