@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+.gitignore
+.env*
+npm-debug.log*
+.DS_Store
+example_template
+tsconfig.tsbuildinfo
+README.md
