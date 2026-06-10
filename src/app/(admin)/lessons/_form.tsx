@@ -42,6 +42,7 @@ const schema = z.object({
   title: z.string().min(1, "Bắt buộc").max(255),
   content: z.string().optional().or(z.literal("")),
   video_url: z.string().max(1000).optional().or(z.literal("")),
+  video_type: z.enum(["auto", "youtube", "vimeo", "drive", "file"]),
   duration_minutes: z.number().int().min(0).nullable(),
   position: z.number().int().min(0),
   is_preview: z.boolean(),
@@ -71,6 +72,7 @@ export function LessonForm({
       title: initial?.title ?? "",
       content: initial?.content ?? "",
       video_url: initial?.video_url ?? "",
+      video_type: initial?.video_type ?? "auto",
       duration_minutes: initial?.duration_minutes ?? null,
       position: initial?.position ?? 0,
       is_preview: initial?.is_preview ?? false,
@@ -104,6 +106,7 @@ export function LessonForm({
       section_id: values.section_id,
       content: values.content || null,
       video_url: values.video_url || null,
+      video_type: values.video_type,
       duration_minutes: values.duration_minutes,
       position: values.position,
       is_preview: values.is_preview,
@@ -265,8 +268,37 @@ export function LessonForm({
             <FormItem>
               <FormLabel>Video URL</FormLabel>
               <FormControl>
-                <Input placeholder="https://… (YouTube/Vimeo/CDN)" {...field} />
+                <Input placeholder="https://… (YouTube/Vimeo/Drive/CDN)" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="video_type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Loại video</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="auto">Tự động (đoán từ URL)</SelectItem>
+                  <SelectItem value="youtube">YouTube</SelectItem>
+                  <SelectItem value="vimeo">Vimeo</SelectItem>
+                  <SelectItem value="drive">Google Drive</SelectItem>
+                  <SelectItem value="file">File trực tiếp (mp4…)</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Để &quot;Tự động&quot; cho hầu hết link. Chọn đúng nhà cung cấp
+                nếu video không hiện (vd Vimeo riêng tư, link YouTube dạng lạ).
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

@@ -113,7 +113,10 @@ export default function LearnPage() {
     enabled: !!activeId && activeAccessible,
   })
   const lessonFull = lessonQ.data ?? null
-  const video = resolveVideo(lessonFull?.video_url ?? null)
+  const video = resolveVideo(
+    lessonFull?.video_url ?? null,
+    lessonFull?.video_type ?? "auto",
+  )
 
   if (!authChecked) return null
 

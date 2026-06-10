@@ -153,6 +153,8 @@ export interface CourseUpdate {
   category_ids?: number[] | null
 }
 
+export type VideoType = "auto" | "youtube" | "vimeo" | "drive" | "file"
+
 export interface Lesson {
   id: number
   course_id: number
@@ -160,6 +162,7 @@ export interface Lesson {
   title: string
   content: string | null
   video_url: string | null
+  video_type: VideoType
   duration_minutes: number | null
   position: number
   is_preview: boolean
@@ -174,6 +177,7 @@ export interface LessonCreate {
   title: string
   content?: string | null
   video_url?: string | null
+  video_type?: VideoType
   duration_minutes?: number | null
   position: number
   is_preview: boolean
@@ -184,6 +188,7 @@ export interface LessonUpdate {
   title?: string
   content?: string | null
   video_url?: string | null
+  video_type?: VideoType
   duration_minutes?: number | null
   position?: number
   is_preview?: boolean

@@ -17,6 +17,8 @@ export interface EnrollmentRow {
   status: string
 }
 
+export type VideoType = "auto" | "youtube" | "vimeo" | "drive" | "file"
+
 export interface LessonFull {
   id: number
   course_id: number
@@ -24,6 +26,7 @@ export interface LessonFull {
   title: string
   content: string | null
   video_url: string | null
+  video_type: VideoType
   duration_minutes: number | null
   position: number
   is_preview: boolean
@@ -38,45 +41,74 @@ export interface ProgressRow {
   seconds_watched: number
 }
 
+type Resolved = { kind: "iframe" | "video"; src: string }
+
+/** YouTube → /embed iframe. Handles watch, youtu.be, embed, shorts, live, v/. */
+function youtubeEmbed(u: string): Resolved | null {
+  const m =
+    u.match(
+      /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/|v\/)|youtu\.be\/)([\w-]{11})/,
+    ) || u.match(/[?&]v=([\w-]{11})/)
+  return m
+    ? { kind: "iframe", src: `https://www.youtube.com/embed/${m[1]}` }
+    : null
+}
+
 /**
- * Resolve a lesson video URL into a playable embed.
- * - YouTube (watch / youtu.be / embed) → iframe embed
- * - Google Drive (file/d, open?id, uc?id) → /preview iframe (file must be shared
- *   "Anyone with the link")
- * - Vimeo → player iframe
- * - Direct file (.mp4/.webm/...) → native <video>
- * - Anything else → assume an embeddable iframe URL
+ * Vimeo → player iframe. Keeps the privacy hash (from `/123/HASH` path or
+ * `?h=HASH` query) so unlisted/private videos still play.
+ */
+function vimeoEmbed(u: string): Resolved | null {
+  const m = u.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/(\w+))?/)
+  if (!m) return null
+  const hash = u.match(/[?&]h=(\w+)/)?.[1] ?? m[2]
+  const src = `https://player.vimeo.com/video/${m[1]}${hash ? `?h=${hash}` : ""}`
+  return { kind: "iframe", src }
+}
+
+/** Google Drive → /preview iframe (file must be shared "Anyone with the link"). */
+function driveEmbed(u: string): Resolved | null {
+  const m = u.match(/\/file\/d\/([\w-]+)/) || u.match(/[?&]id=([\w-]+)/)
+  return m
+    ? { kind: "iframe", src: `https://drive.google.com/file/d/${m[1]}/preview` }
+    : null
+}
+
+/**
+ * Resolve a lesson video into a playable embed.
+ *
+ * `type` lets the admin force a provider (so unusual URL formats still work);
+ * `auto` (default) detects the provider from the URL. The raw-URL fallback is
+ * a last resort — note YouTube/Vimeo refuse to embed their *page* URLs, which
+ * is why forcing the type or pasting a proper link matters.
  */
 export function resolveVideo(
   url: string | null,
-): { kind: "iframe" | "video"; src: string } | null {
+  type: VideoType = "auto",
+): Resolved | null {
   if (!url) return null
   const u = url.trim()
+  if (!u) return null
 
-  const yt = u.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/,
-  )
-  if (yt) return { kind: "iframe", src: `https://www.youtube.com/embed/${yt[1]}` }
-
-  if (u.includes("drive.google.com")) {
-    const gd =
-      u.match(/\/file\/d\/([\w-]+)/) || u.match(/[?&]id=([\w-]+)/)
-    if (gd) {
-      return {
-        kind: "iframe",
-        src: `https://drive.google.com/file/d/${gd[1]}/preview`,
-      }
-    }
+  switch (type) {
+    case "youtube":
+      return youtubeEmbed(u) ?? { kind: "iframe", src: u }
+    case "vimeo":
+      return vimeoEmbed(u) ?? { kind: "iframe", src: u }
+    case "drive":
+      return driveEmbed(u) ?? { kind: "iframe", src: u }
+    case "file":
+      return { kind: "video", src: u }
+    default:
+      return (
+        youtubeEmbed(u) ??
+        vimeoEmbed(u) ??
+        driveEmbed(u) ??
+        (/\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i.test(u)
+          ? { kind: "video", src: u }
+          : { kind: "iframe", src: u })
+      )
   }
-
-  const vm = u.match(/vimeo\.com\/(?:video\/)?(\d+)/)
-  if (vm) return { kind: "iframe", src: `https://player.vimeo.com/video/${vm[1]}` }
-
-  if (/\.(mp4|webm|ogg|mov|m4v)(\?|#|$)/i.test(u)) {
-    return { kind: "video", src: u }
-  }
-
-  return { kind: "iframe", src: u }
 }
 
 export const learning = {
