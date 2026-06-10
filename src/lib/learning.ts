@@ -82,6 +82,13 @@ export function resolveVideo(
 export const learning = {
   me: () => apiFetch<StudentMe>("/students/me"),
 
+  // All enrollments for the current student. The backend forces the
+  // student_id filter to the authenticated user, so no argument is needed.
+  myEnrollments: () =>
+    apiFetch<Page<EnrollmentRow>>("/enrollments/", {
+      query: { limit: 200 },
+    }),
+
   enrollmentsForCourse: (courseId: number) =>
     apiFetch<Page<EnrollmentRow>>("/enrollments/", {
       query: { course_id: courseId },

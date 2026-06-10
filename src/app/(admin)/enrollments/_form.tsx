@@ -79,8 +79,8 @@ export function EnrollmentForm({
   })
 
   const studentsQuery = useQuery({
-    queryKey: ["students", { limit: 500 }],
-    queryFn: () => studentsService.list({ limit: 500 }),
+    queryKey: ["students", { limit: 1000 }],
+    queryFn: () => studentsService.list({ limit: 1000 }),
   })
 
   const coursesQuery = useQuery({

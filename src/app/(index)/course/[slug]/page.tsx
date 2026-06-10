@@ -10,7 +10,7 @@ import {
   parseCourseContent,
   totalMinutes,
 } from "@/lib/courses"
-import { CurriculumModule, FaqItem } from "./_parts"
+import { CourseCta, CurriculumModule, FaqItem } from "./_parts"
 
 export async function generateMetadata({
   params,
@@ -86,10 +86,11 @@ export default async function CourseLandingPage({
             )}
           </div>
           <div className="hero-cta">
-            <Link href={`/checkout?course=${course.slug}`} className="btn btn-primary">
-              <span>Đăng ký khóa học</span>
-              <span className="ms">arrow_forward</span>
-            </Link>
+            <CourseCta
+              slug={course.slug}
+              courseId={course.id}
+              enrollLabel="Đăng ký khóa học"
+            />
             <Link href="#curriculum" className="ghost">
               <span className="play">
                 <span className="ms fill">play_arrow</span>
@@ -328,10 +329,11 @@ export default async function CourseLandingPage({
             <div className="note">
               {payable === 0 ? "Miễn phí · cần đăng ký" : "Thanh toán một lần · truy cập trọn đời"}
             </div>
-            <Link href={`/checkout?course=${course.slug}`} className="btn btn-primary">
-              <span>Đăng ký ngay</span>
-              <span className="ms">arrow_forward</span>
-            </Link>
+            <CourseCta
+              slug={course.slug}
+              courseId={course.id}
+              enrollLabel="Đăng ký ngay"
+            />
             {c.includes && c.includes.length > 0 && (
               <ul>
                 {c.includes.map((item, i) => (

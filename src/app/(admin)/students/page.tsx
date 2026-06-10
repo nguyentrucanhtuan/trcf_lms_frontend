@@ -144,7 +144,7 @@ export default function StudentsPage() {
                   <TableCell>
                     <div className="font-medium">{s.full_name}</div>
                     <div className="text-xs text-muted-foreground">
-                      user_id={s.user_id}
+                      {s.email ?? `user_id=${s.user_id}`}
                     </div>
                   </TableCell>
                   <TableCell>{s.phone || "—"}</TableCell>

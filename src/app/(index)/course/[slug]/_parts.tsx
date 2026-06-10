@@ -1,12 +1,67 @@
 "use client"
 
-import { useState } from "react"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { getStoredUser } from "@/lib/auth"
+import { learning } from "@/lib/learning"
 import {
   humanDuration,
   lessonLength,
   type CourseContent,
   type SectionWithLessons,
 } from "@/lib/courses"
+
+/**
+ * Course CTA that adapts to the viewer:
+ * - enrolled student  → "Vào học" link to the learning page
+ * - everyone else     → the normal "Đăng ký" link to checkout
+ * Renders the checkout link on first paint (SSR-safe) and upgrades to
+ * "Vào học" after mount once enrollment is confirmed.
+ */
+export function CourseCta({
+  slug,
+  courseId,
+  enrollLabel,
+}: {
+  slug: string
+  courseId: number
+  enrollLabel: string
+}) {
+  const [mounted, setMounted] = useState(false)
+  const [isStudent, setIsStudent] = useState(false)
+
+  useEffect(() => {
+    const u = getStoredUser()
+    setIsStudent(u?.role === "student")
+    setMounted(true)
+  }, [])
+
+  const enrolledQ = useQuery({
+    queryKey: ["my-enroll-course", courseId],
+    enabled: mounted && isStudent,
+    queryFn: async () => {
+      const page = await learning.enrollmentsForCourse(courseId)
+      return page.items.some((e) => e.status !== "cancelled")
+    },
+  })
+
+  if (isStudent && enrolledQ.data === true) {
+    return (
+      <Link href={`/hoc/${slug}`} className="btn btn-primary">
+        <span>Vào học</span>
+        <span className="ms">arrow_forward</span>
+      </Link>
+    )
+  }
+
+  return (
+    <Link href={`/checkout?course=${slug}`} className="btn btn-primary">
+      <span>{enrollLabel}</span>
+      <span className="ms">arrow_forward</span>
+    </Link>
+  )
+}
 
 function moduleMinutes(section: SectionWithLessons): number {
   return section.lessons.reduce((s, l) => s + (l.duration_minutes ?? 0), 0)

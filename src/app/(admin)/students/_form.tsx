@@ -159,7 +159,22 @@ export function StudentForm({ initial }: { initial?: Student }) {
               </FormItem>
             )}
           />
-        ) : null}
+        ) : (
+          <FormItem>
+            <FormLabel>Tài khoản người dùng</FormLabel>
+            <FormControl>
+              <Input
+                value={initial?.email ?? `user_id=${initial?.user_id ?? ""}`}
+                readOnly
+                disabled
+              />
+            </FormControl>
+            <FormDescription>
+              Email đăng nhập đã liên kết. Không thể đổi tài khoản sau khi đã
+              tạo hồ sơ học viên.
+            </FormDescription>
+          </FormItem>
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField

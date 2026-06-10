@@ -38,6 +38,7 @@ export interface UserUpdate {
 export interface Student {
   id: number
   user_id: number
+  email: string | null
   student_code: string
   full_name: string
   phone: string | null

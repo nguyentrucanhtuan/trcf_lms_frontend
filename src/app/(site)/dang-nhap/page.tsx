@@ -13,7 +13,7 @@ import { authService } from "@/lib/services"
 function SignInForm() {
   const router = useRouter()
   const params = useSearchParams()
-  const next = params.get("next") || "/"
+  const next = params.get("next") || "/khoa-hoc-cua-toi"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

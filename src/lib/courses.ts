@@ -92,6 +92,15 @@ export async function fetchCourseBySlug(
   return (await res.json()) as CourseDetail
 }
 
+export async function fetchCourseById(
+  id: number,
+): Promise<CourseDetail | null> {
+  const res = await fetch(`${API_URL}/courses/${id}`, { cache: "no-store" })
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`Failed to load course (${res.status})`)
+  return (await res.json()) as CourseDetail
+}
+
 export async function fetchPublishedCourses(
   limit = 12,
 ): Promise<CoursePublic[]> {

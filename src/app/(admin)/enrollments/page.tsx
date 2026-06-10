@@ -81,8 +81,8 @@ function EnrollmentsPageInner() {
   })
 
   const studentsQuery = useQuery({
-    queryKey: ["students", { limit: 500 }],
-    queryFn: () => studentsService.list({ limit: 500 }),
+    queryKey: ["students", { limit: 1000 }],
+    queryFn: () => studentsService.list({ limit: 1000 }),
   })
 
   const coursesById = useMemo(() => {
@@ -245,6 +245,7 @@ function EnrollmentsPageInner() {
                           <div className="font-medium">{s.full_name}</div>
                           <div className="text-xs text-muted-foreground">
                             {s.student_code}
+                            {s.email ? ` · ${s.email}` : ""}
                           </div>
                         </>
                       ) : (
